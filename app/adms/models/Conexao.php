@@ -27,7 +27,7 @@ class Conexao {
     //tabela adms_nivacs_pgs
     //seja igual ao id da tabela adms_pagina E
     //endereco cadastrado seja igual ao passado pela url
-    // e o adms_niveis_acesso_id chave estrageira da tabela adms_niveis_acessos tem que ser igual ao adms_niveis_acesso_id
+    // e o adms_niveis_acesso_id chave estrangeira da tabela adms_niveis_acessos tem que ser igual ao adms_niveis_acesso_id
     // que esta cadastrado no usuario.
     
     public function paginasCadastradas($url){
@@ -55,20 +55,58 @@ class Conexao {
         return $result;
     }
 
+
+    //essa funcao valida o login do usuario
     public function validarLogin(){
         $result = array();
-        $cmd = $this->pdo->query("SELECT id, nome, email, senha , adms_niveis_acesso_id FROM adms_usuarios  WHERE usuario=usuario LIMIT 1");
+        $cmd = $this->pdo->query("SELECT id, nome, email, senha , adms_niveis_acesso_id 
+        FROM adms_usuarios  WHERE usuario=usuario LIMIT 1");
         $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
         return $result;
     }
 
+    //Essa função buscar a ordem do nivel de acesso do usuario
     public function buscarOrdemNivelAcesso($adms_niv_ac_id){
         $result = array();
-        $cmd = $this->pdo->prepare("SELECT ordem FROM adms_niveis_acessos WHERE id=:adms_niv_ac_id LIMIT 1");
+        $cmd = $this->pdo->prepare("SELECT ordem FROM adms_niveis_acessos 
+        WHERE id=:adms_niv_ac_id LIMIT 1");
         $cmd->bindParam(":adms_niv_ac_id", $adms_niv_ac_id);
         $cmd->execute();
         $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
         return $result;
+    }
+
+    //Essa função busca os dados do usuario no banco de dados.
+    public function buscarDadosUsuarios(){
+        $result = array();
+        $cmd = $this->pdo->prepare("SELECT id, nome, imagem FROM adms_usuarios 
+        WHERE id=:id LIMIT 1");
+        $cmd->bindValue(":id", $_SESSION['id'], PDO::PARAM_INT);
+        $cmd->execute();
+        $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+        
+    }
+
+
+    //essa funcao pega todos os valores da tabela adms_nivacs_pgs onde o adms_niveis_cesso_id é igual
+    // ao do usuario logado tambem a coluna permissao seja igual a 1 e tambem a lib_menu tem que estar liberada .
+    public function buscarBotoesMenu(){
+        $result = array();
+        $cmd = $this->pdo->prepare("SELECT nivpg.*,
+        men.nome, men.icone,
+        pg.nome_pagina, pg.endereco, pg.icone 
+        FROM adms_nivacs_pgs nivpg
+        INNER JOIN adms_menus men ON men.id=nivpg.adms_menu_id
+        INNER JOIN adms_paginas pg ON pg.id=nivpg.adms_pagina_id
+        WHERE nivpg.adms_niveis_acesso_id=:adms_niveis_acesso_id
+            AND nivpg.permissao=1
+            AND nivpg.lib_menu=1 ");
+        $cmd->bindValue(":adms_niveis_acesso_id", $_SESSION['adms_niveis_acesso_id']);
+        $cmd->execute();
+        $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+        
     }
     
 }
