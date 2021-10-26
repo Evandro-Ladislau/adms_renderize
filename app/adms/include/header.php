@@ -1,5 +1,5 @@
 <?php
-if(!isset($seguranca)){
+if (!isset($seguranca)) {
     exit;
 }
 require_once './app/adms/models/Conexao.php';

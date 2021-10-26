@@ -2,55 +2,72 @@
 if (!isset($seguranca)) {
     exit;
 }
+require_once '../adm/index.php';
 ?>
+<div class="d-flex">
+    <nav class="sidebar">
+        <ul class="list-unstyled">
+            <?php
+            //chama a funcao que busca os botoes do meno cadastrados no banco.
+            $result_niveis_acessos_pgs = $pdo->buscarBotoesMenu();
 
-<nav class="sidebar">
-    <ul class="list-unstyled">
-        <?php
-        //chama a funcao que busca os botoes do meno cadastrados no banco.
-        $result_niveis_acessos_pgs = $pdo->buscarBotoesMenu();
-        for ($i = 0; $i < count($result_niveis_acessos_pgs); $i++) {
-            //echo "ID : ".$result_niveis_acessos_pgs[$i]['id'];
-            //echo "<i class='".$result_niveis_acessos_pgs[$i]['icone']."'></i>".$result_niveis_acessos_pgs[$i]['nome']."<br>";
-            //aqui foi implementado o dropdown. se dropdown for igul a 1 ele impreme o menu e sub menu
-            //se nao ele imprime somente o menu.
-            if ($result_niveis_acessos_pgs[$i]['dropdown'] == 1) {
-        ?>
-                <li>
-                    <a href="#submenu1" data-toggle="collapse">
-                        <i class="fas fa-user"></i> Usuários
-                    </a>
-                    <ul class="list-unstyled collapse" id="submenu1">
-                        <li><a href="listar.html"><i class="fas fa-users"></i> Usuários </a> </li>
-                        <li><a href="#"><i class="fas fa-key"></i> Niveis de Acesso </a> </li>
-                    </ul>
-                </li>
-        <?php
-            } else {
-                echo "<li><a href='" . pg . "/" . $result_niveis_acessos_pgs[$i]['endereco'] . "'><i class='" . $result_niveis_acessos_pgs[$i]['icone'] . "'></i> " . $result_niveis_acessos_pgs[$i]['nome'] . "</a></li>";
+            //essas variaveis são para fazer a logica da impressao do dropdown.
+            $cont_drop_fech = 0;
+            $cont_drop = 0;
+            for ($i = 0; $i < count($result_niveis_acessos_pgs); $i++) {
+                //echo "ID : ".$result_niveis_acessos_pgs[$i]['id'];
+                //echo "<i class='".$result_niveis_acessos_pgs[$i]['icone']."'></i>".$result_niveis_acessos_pgs[$i]['nome']."<br>";
+                //aqui foi implementado o dropdown. se dropdown for igul a 1 ele impreme o menu e sub menu
+                //se nao ele imprime somente o menu.
+
+                //esse if verifica qual pagina esta ativa no momento
+                //usei o for para percorrer o array de result_paginas.
+                for ($c = 0; $c < count($result_paginas); $c++) {
+                    if ($result_paginas[$c]['id'] == $result_niveis_acessos_pgs[$i]['id_pg_menu']) {
+                        $menu_ativado = "active";
+                    } else {
+                        $menu_ativado = "";
+                    }
+                }
+
+
+                //implementado o dropbown
+                if ($result_niveis_acessos_pgs[$i]['dropdown'] == 1) {
+                    if ($cont_drop != $result_niveis_acessos_pgs[$i]['id']) {
+
+                        if (($cont_drop_fech == 1) and ($cont_drop != 0)) {
+                            echo "</ul>";
+                            echo "</li>";
+                            $cont_drop_fech == 0;
+                        }
+                        echo "<li>";
+                        echo "<a href='#submenu" . $result_niveis_acessos_pgs[$i]['id'] . "' data-toggle='collapse'>";
+                        echo    "<i class='" . $result_niveis_acessos_pgs[$i]['iconmen'] . "'></i> " . $result_niveis_acessos_pgs[$i]['nomemen'] . "";
+                        echo "</a>";
+                        echo "<ul class='list-unstyled collapse' id='submenu" . $result_niveis_acessos_pgs[$i]['id'] . "'>";
+                        $cont_drop = $result_niveis_acessos_pgs[$i]['id'];
+                    }
+                    echo "<li class='$menu_ativado'><a href='" . pg . "/" . $result_niveis_acessos_pgs[$i]['endereco'] . "'><i class='" . $result_niveis_acessos_pgs[$i]['iconpg'] . "'></i> " . $result_niveis_acessos_pgs[$i]['nomepg'] . "</a></li>";
+
+                    $cont_drop_fech = 1;
+                } else {
+                    if ($cont_drop_fech == 1) {
+                        echo "</ul>";
+                        echo "</li>";
+                        $cont_drop_fech == 0;
+                    }
+                    echo "<li  class='$menu_ativado'><a href='" . pg . "/" . $result_niveis_acessos_pgs[$i]['endereco'] . "'><i class='" . $result_niveis_acessos_pgs[$i]['iconmen'] . "'></i> " . $result_niveis_acessos_pgs[$i]['nomemen'] . "</a></li>";
+                }
             }
-        }
-        ?>
-        <li><a href="#"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-        <li>
-            <a href="#submenu1" data-toggle="collapse">
-                <i class="fas fa-user"></i> Usuários
-            </a>
-            <ul class="list-unstyled collapse" id="submenu1">
-                <li><a href="listar.html"><i class="fas fa-users"></i> Usuários </a> </li>
-                <li><a href="#"><i class="fas fa-key"></i> Niveis de Acesso </a> </li>
-            </ul>
-        </li>
-        <li><a href="#submenu2" data-toggle="collapse"><i class="fas fa-list"></i> Menu</a>
-            <ul class="list-unstyled collapse" id="submenu2">
-                <li><a href="#"><i class="fas fa-file-alt"></i> Páginas </a> </li>
-                <li><a href="#"><i class="fab fa-elementor"></i> Item de Menu </a> </li>
-            </ul>
-        </li>
-        <li><a href="#">Item 1</a></li>
-        <li><a href="#">Item 2</a></li>
-        <li><a href="#">Item 3</a></li>
-        <li class="active"><a href="#">Item 4</a></li>
-        <li><a href="#"><i class="fas fa-sign-out-alt"></i> Sair</a></li>
-    </ul>
-</nav>
+
+            if ($cont_drop_fech == 1) {
+                echo "</ul>";
+                echo "</li>";
+                $cont_drop_fech == 0;
+            }
+            ?>
+
+
+        </ul>
+    </nav>
+</div>

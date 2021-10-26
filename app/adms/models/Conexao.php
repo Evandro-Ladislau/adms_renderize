@@ -39,7 +39,7 @@ class Conexao {
             $adms_niveis_acesso_id = 0;
         }
 
-        $cmd = $this->pdo->prepare("SELECT pg.tp_pagina, pg.endereco 
+        $cmd = $this->pdo->prepare("SELECT pg.id, pg.tp_pagina, pg.endereco 
         FROM adms_paginas pg
         LEFT JOIN adms_nivacs_pgs nivpg ON nivpg.adms_pagina_id=pg.id
         WHERE pg.endereco=:endereco
@@ -93,20 +93,37 @@ class Conexao {
     // ao do usuario logado tambem a coluna permissao seja igual a 1 e tambem a lib_menu tem que estar liberada .
     public function buscarBotoesMenu(){
         $result = array();
-        $cmd = $this->pdo->prepare("SELECT nivpg.*,
-        men.nome, men.icone,
-        pg.nome_pagina, pg.endereco, pg.icone 
+        $cmd = $this->pdo->prepare("SELECT nivpg.dropdown,
+        men.id, men.nome nomemen, men.icone iconmen,
+        pg.id id_pg_menu, pg.nome_pagina nomepg, pg.endereco, pg.icone iconpg
         FROM adms_nivacs_pgs nivpg
         INNER JOIN adms_menus men ON men.id=nivpg.adms_menu_id
         INNER JOIN adms_paginas pg ON pg.id=nivpg.adms_pagina_id
         WHERE nivpg.adms_niveis_acesso_id=:adms_niveis_acesso_id
             AND nivpg.permissao=1
-            AND nivpg.lib_menu=1 ");
-        $cmd->bindValue(":adms_niveis_acesso_id", $_SESSION['adms_niveis_acesso_id']);
+            AND nivpg.lib_menu=1 
+            ORDER BY men.ordem, nivpg.ordem ASC");
+        $cmd->bindValue(":adms_niveis_acesso_id", $_SESSION['adms_niveis_acesso_id'], PDO::PARAM_INT);
         $cmd->execute();
         $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
         return $result;
         
+    }
+
+    //Essa pega as informacoes da tabela adms_niveis_acesso onde a ordem do usuario logado seja igual ou menos que os outros usuarios
+    // e limita o resultado do inicio da pagina que ele esta ao valor final de paginas.
+    public function paginacaoNivelAcesso($inicio,$qnt_result_pg){
+        $result = array();
+        $cmd = $this->pdo->prepare("SELECT * FROM adms_niveis_acessos 
+        WHERE ordem >= :ordem 
+        ORDER BY ordem 
+        ASC LIMIT :inicio, :qnt_result_pg");
+        $cmd->bindValue(":ordem",$_SESSION['ordem'], PDO::PARAM_INT);
+        $cmd->bindValue(":inicio", $inicio, PDO::PARAM_INT);
+        $cmd->bindParam(":qnt_result_pg", $qnt_result_pg, PDO::PARAM_INT);
+        $cmd->execute();
+        $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
     }
     
 }
