@@ -23,13 +23,17 @@ include_once 'app/adms/include/head.php';
                     <div class="mr-auto p-2">
                         <h2 class="display-4 titulo">Listar Nivel de Acesso</h2>
                     </div>
-                    <a href="cadastrar.html">
-                        <div class="p-2">
-                            <button class="btn btn-outline-success btn-sm">
-                                Cadastar
-                            </button>
-                        </div>
-                    </a>
+                    <div class="p-2">
+                        <?php
+                        $btn_cad = $pdo->carregarBtn('cadastrar/cad_niv_aces');
+                        
+                        if($btn_cad){
+                            echo "<a href='".pg."/cadastrar/cad_niv_aces' class='btn btn-outline-success btn-sm'>Cadastar</a>";
+                        }
+                        ?>
+                        
+                    </div>
+
                 </div>
                 <div class="alert alert-success" role="alert">
                     Usuario Apagado com Sucesso!
@@ -65,54 +69,81 @@ include_once 'app/adms/include/head.php';
                             <tbody>
                                 <?php
                                 //pegando as informações do nivel de acesso cadastradas no banco de dados.
-                                for ($i=0; $i <count($result_paginacaoNivelAcesso) ; $i++) { 
-                                    ?>
+                                for ($i = 0; $i < count($result_paginacaoNivelAcesso); $i++) {
+                                ?>
                                     <tr>
-                                    <th><?php echo $result_paginacaoNivelAcesso[$i]['id']?></th>
-                                    <td><?php echo $result_paginacaoNivelAcesso[$i]['nome']?></td>
-                                    <td class="d-none d-sm-table-cell"><?php echo $result_paginacaoNivelAcesso[$i]['ordem']?></td>
-                                    <td class="text-center">
-                                        <span class="d-none d-md-block">
-                                            <a href="visualizar.html" class="btn btn-outline-primary btn-sm">Visualizar</a>
-                                            <a href="editar.html" class="btn btn-outline-success btn-sm">Editar</a>
-                                            <a href="apagar.html" data-toggle="modal" data-target="#apagarRegistro" class="btn btn-outline-danger btn-sm">Apagar</a>
-                                        </span>
-                                        <div class="dropdown d-block d-md-none">
-                                            <button class="btn btn-primary dropdown-toggle btn-sm" type="button" id="acoeslistar" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                Ações
-                                            </button>
-                                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="acoeslistar">
-                                                <a class="dropdown-item" href="visualizar.html">Visualizar</a>
-                                                <a class="dropdown-item" href="editar.html">Editar</a>
-                                                <a class="dropdown-item" data-toggle="modal" data-target="#apagarRegistro" href="apagar.html">Apagar</a>
+                                        <th><?php echo $result_paginacaoNivelAcesso[$i]['id'] ?></th>
+                                        <td><?php echo $result_paginacaoNivelAcesso[$i]['nome'] ?></td>
+                                        <td class="d-none d-sm-table-cell"><?php echo $result_paginacaoNivelAcesso[$i]['ordem'] ?></td>
+                                        <td class="text-center">
+                                            <span class="d-none d-md-block">
+                                                <a href="visualizar.html" class="btn btn-outline-primary btn-sm">Visualizar</a>
+                                                <a href="editar.html" class="btn btn-outline-success btn-sm">Editar</a>
+                                                <a href="apagar.html" data-toggle="modal" data-target="#apagarRegistro" class="btn btn-outline-danger btn-sm">Apagar</a>
+                                            </span>
+                                            <div class="dropdown d-block d-md-none">
+                                                <button class="btn btn-primary dropdown-toggle btn-sm" type="button" id="acoeslistar" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                    Ações
+                                                </button>
+                                                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="acoeslistar">
+                                                    <a class="dropdown-item" href="visualizar.html">Visualizar</a>
+                                                    <a class="dropdown-item" href="editar.html">Editar</a>
+                                                    <a class="dropdown-item" data-toggle="modal" data-target="#apagarRegistro" href="apagar.html">Apagar</a>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </td>
-                                </tr>
+                                        </td>
+                                    </tr>
 
-                                    <?php
+                                <?php
                                 }
                                 ?>
-                                
+
                             </tbody>
                         </table>
-                        <nav aria-label="paginacao">
-                            <ul class="pagination pagination-sm justify-content-center">
-                                <li class="page-item disabled">
-                                    <a class="page-link" href="#" tabindex="-1">Primeira</a>
-                                </li>
-                                <li class="page-item"><a class="page-link" href="#">1</a></li>
-                                <li class="page-item"><a class="page-link" href="#">2</a></li>
-                                <li class="page-item active">
-                                    <a class="page-link" href="#">3</a>
-                                </li>
-                                <li class="page-item"><a class="page-link" href="#">4</a></li>
-                                <li class="page-item"><a class="page-link" href="#">5</a></li>
-                                <li class="page-item">
-                                    <a class="page-link" href="#">Ultima</a>
-                                </li>
-                            </ul>
-                        </nav>
+                        <?php
+                        //chama a funcao com a quantidade de registro.
+                        $result_pg = $pdo->paginacao();
+                        for ($i = 0; $i < count($result_pg); $i++) {
+                            //quantidade de pagina
+                            $quantidade_pg = ceil($result_pg[$i]['num_result'] / $qnt_result_pg);
+                            //limitar os links antes    
+                            $max_links = 2;
+                            echo "<nav aria-label='paginacao'>";
+                            echo "<ul class='pagination pagination-sm justify-content-center'>";
+                            echo "<li class='page-item'>";
+                            echo "<a class='page-link' href='" . pg . "/listar/list_niv_aces?pagina=1' tabindex='-1'>Primeira</a>";
+                            echo "</li>";
+
+                            //mostra a pagina anterior a pagina que o usuario esta
+                            //o if é para a pagina ser mostrada só se o valor for maior que 1
+                            for ($pag_ant = $pagina - $max_links; $pag_ant <= $pagina - 1; $pag_ant++) {
+                                if ($pag_ant >= 1) {
+                                    echo "<li class='page-item'><a class='page-link' href='" . pg . "/listar/list_niv_aces?pagina=$pag_ant'>$pag_ant</a></li>";
+                                }
+                            }
+
+                            //pagina onde o usuario esta (pagina_atual)    
+                            echo "<li class='page-item active'>";
+                            echo "<a class='page-link' href='#'>$pagina</a>";
+                            echo "</li>";
+
+
+                            //mostra pagina posterior de onde o usuario esta
+                            for ($pag_dep = $pagina + 1; $pag_dep <= $pagina + $max_links; $pag_dep++) {
+                                if ($pag_dep <= $quantidade_pg) {
+                                    echo "<li class='page-item'><a class='page-link' href='" . pg . "/listar/list_niv_aces?pagina=$pag_dep'>$pag_dep</a></li>";
+                                }
+                            }
+
+                            //limita o link depois
+                            echo "<li class='page-item'>";
+                            echo "<a class='page-link' href='" . pg . "/listar/list_niv_aces?pagina=$quantidade_pg'>Ultima</a>";
+                            echo "</li>";
+                            echo "</ul>";
+                            echo "</nav>";
+                        }
+                        ?>
+
                     </div>
                 <?php
                 } else {

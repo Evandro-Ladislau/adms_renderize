@@ -1,9 +1,10 @@
 <?php
-if(!isset($seguranca)){
+if (!isset($seguranca)) {
     exit;
 }
 //classe de conexão com o banco de dados.
-class Conexao {
+class Conexao
+{
     private $pdo; // atributo privado só é usado dentro da classe.
 
     //CONEXÃO COM BANCO DE DADOS
@@ -12,13 +13,12 @@ class Conexao {
     {
 
         try {
-            $this->pdo = new PDO("mysql:dbname=".$dbname.";host=".$host,$user,$senha);
+            $this->pdo = new PDO("mysql:dbname=" . $dbname . ";host=" . $host, $user, $senha);
         } catch (PDOException $e) {
-            echo "Erro na conexão com banco de dados:".$e->getMessage();
+            echo "Erro na conexão com banco de dados:" . $e->getMessage();
             exit();
-
-        }catch(Exception $e){
-            echo "Erro generico".$e->getMessage();
+        } catch (Exception $e) {
+            echo "Erro generico" . $e->getMessage();
             exit();
         }
     }
@@ -29,13 +29,14 @@ class Conexao {
     //endereco cadastrado seja igual ao passado pela url
     // e o adms_niveis_acesso_id chave estrangeira da tabela adms_niveis_acessos tem que ser igual ao adms_niveis_acesso_id
     // que esta cadastrado no usuario.
-    
-    public function paginasCadastradas($url){
+
+    public function paginasCadastradas($url)
+    {
         $result = array();
-        
+
         if (isset($_SESSION['adms_niveis_acesso_id'])) {
             $adms_niveis_acesso_id = $_SESSION['adms_niveis_acesso_id'];
-        }else{
+        } else {
             $adms_niveis_acesso_id = 0;
         }
 
@@ -57,7 +58,8 @@ class Conexao {
 
 
     //essa funcao valida o login do usuario
-    public function validarLogin(){
+    public function validarLogin()
+    {
         $result = array();
         $cmd = $this->pdo->query("SELECT id, nome, email, senha , adms_niveis_acesso_id 
         FROM adms_usuarios  WHERE usuario=usuario LIMIT 1");
@@ -66,7 +68,8 @@ class Conexao {
     }
 
     //Essa função buscar a ordem do nivel de acesso do usuario
-    public function buscarOrdemNivelAcesso($adms_niv_ac_id){
+    public function buscarOrdemNivelAcesso($adms_niv_ac_id)
+    {
         $result = array();
         $cmd = $this->pdo->prepare("SELECT ordem FROM adms_niveis_acessos 
         WHERE id=:adms_niv_ac_id LIMIT 1");
@@ -77,7 +80,8 @@ class Conexao {
     }
 
     //Essa função busca os dados do usuario no banco de dados.
-    public function buscarDadosUsuarios(){
+    public function buscarDadosUsuarios()
+    {
         $result = array();
         $cmd = $this->pdo->prepare("SELECT id, nome, imagem FROM adms_usuarios 
         WHERE id=:id LIMIT 1");
@@ -85,13 +89,13 @@ class Conexao {
         $cmd->execute();
         $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
         return $result;
-        
     }
 
 
     //essa funcao pega todos os valores da tabela adms_nivacs_pgs onde o adms_niveis_cesso_id é igual
     // ao do usuario logado tambem a coluna permissao seja igual a 1 e tambem a lib_menu tem que estar liberada .
-    public function buscarBotoesMenu(){
+    public function buscarBotoesMenu()
+    {
         $result = array();
         $cmd = $this->pdo->prepare("SELECT nivpg.dropdown,
         men.id, men.nome nomemen, men.icone iconmen,
@@ -107,23 +111,55 @@ class Conexao {
         $cmd->execute();
         $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
         return $result;
-        
     }
 
     //Essa pega as informacoes da tabela adms_niveis_acesso onde a ordem do usuario logado seja igual ou menos que os outros usuarios
     // e limita o resultado do inicio da pagina que ele esta ao valor final de paginas.
-    public function paginacaoNivelAcesso($inicio,$qnt_result_pg){
+    public function paginacaoNivelAcesso($inicio, $qnt_result_pg)
+    {
         $result = array();
         $cmd = $this->pdo->prepare("SELECT * FROM adms_niveis_acessos 
         WHERE ordem >= :ordem 
         ORDER BY ordem 
         ASC LIMIT :inicio, :qnt_result_pg");
-        $cmd->bindValue(":ordem",$_SESSION['ordem'], PDO::PARAM_INT);
+        $cmd->bindValue(":ordem", $_SESSION['ordem'], PDO::PARAM_INT);
         $cmd->bindValue(":inicio", $inicio, PDO::PARAM_INT);
         $cmd->bindParam(":qnt_result_pg", $qnt_result_pg, PDO::PARAM_INT);
         $cmd->execute();
         $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
         return $result;
     }
-    
+
+    //funcao count conta a coluna id e o resultado é atribuido para um apelido(num_result).
+    public function paginacao()
+    {
+        $result = array();
+        $cmd = $this->pdo->query("SELECT COUNT(id) AS num_result FROM adms_niveis_acessos WHERE ordem >= ordem");
+        $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+    }
+
+    public function carregarBtn($endereco)
+    {
+        $result = array();
+        $cmd = $this->pdo->prepare("SELECT pg.id, pg.tp_pagina, pg.endereco 
+        FROM adms_paginas pg
+        LEFT JOIN adms_nivacs_pgs nivpg ON nivpg.adms_pagina_id=pg.id
+        WHERE pg.endereco=:endereco
+        AND (pg.adms_sits_pg_id=1
+        AND (nivpg.adms_niveis_acesso_id=:adms_niveis_acesso_id	
+        AND nivpg.permissao=1))
+         LIMIT 1");
+
+        $cmd->bindValue(":adms_niveis_acesso_id", $_SESSION['adms_niveis_acesso_id'], PDO::PARAM_INT);
+        $cmd->bindValue(":endereco", $endereco, PDO::PARAM_STR);
+        $cmd->execute();
+        $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+
+        if ($result) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 }
