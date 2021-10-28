@@ -26,12 +26,12 @@ include_once 'app/adms/include/head.php';
                     <div class="p-2">
                         <?php
                         $btn_cad = $pdo->carregarBtn('cadastrar/cad_niv_aces');
-                        
-                        if($btn_cad){
-                            echo "<a href='".pg."/cadastrar/cad_niv_aces' class='btn btn-outline-success btn-sm'>Cadastar</a>";
+
+                        if ($btn_cad) {
+                            echo "<a href='" . pg . "/cadastrar/cad_niv_aces' class='btn btn-outline-success btn-sm'>Cadastar</a>";
                         }
                         ?>
-                        
+
                     </div>
 
                 </div>
@@ -77,9 +77,28 @@ include_once 'app/adms/include/head.php';
                                         <td class="d-none d-sm-table-cell"><?php echo $result_paginacaoNivelAcesso[$i]['ordem'] ?></td>
                                         <td class="text-center">
                                             <span class="d-none d-md-block">
-                                                <a href="visualizar.html" class="btn btn-outline-primary btn-sm">Visualizar</a>
-                                                <a href="editar.html" class="btn btn-outline-success btn-sm">Editar</a>
-                                                <a href="apagar.html" data-toggle="modal" data-target="#apagarRegistro" class="btn btn-outline-danger btn-sm">Apagar</a>
+                                                <?php
+                                                //BOTAO VISUALIZAE
+                                                $btn_vis = $pdo->carregarBtn('visualizar/vis_niv_aces');
+
+                                                if ($btn_vis) {
+                                                    echo "<a href='" . pg . "/visualizar/vis_niv_aces?id=".$result_paginacaoNivelAcesso[$i]['id']."' class='btn btn-outline-primary btn-sm'>Visualizar</a>";
+                                                }
+
+                                                //BOTAR EDITAR
+                                                $btn_edit = $pdo->carregarBtn('editar/edit_niv_aces');
+
+                                                if ($btn_edit) {
+                                                    echo "<a href='" . pg . "/editar/edit_niv_aces?id=".$result_paginacaoNivelAcesso[$i]['id']."' class='btn btn-outline-warning btn-sm'>Editar</a>";
+                                                }
+
+                                                //BOTAO PAGAR
+                                                $btn_apagar = $pdo->carregarBtn('processa/apagar_niv_aces');
+
+                                                if ($btn_apagar) {
+                                                    echo "<a href='" . pg . "/processa/apagar_niv_aces' class='btn btn-outline-danger btn-sm' data-toggle='modal' data-target='#apagarRegistro'>Apagar</a>";
+                                                }
+                                                ?>
                                             </span>
                                             <div class="dropdown d-block d-md-none">
                                                 <button class="btn btn-primary dropdown-toggle btn-sm" type="button" id="acoeslistar" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

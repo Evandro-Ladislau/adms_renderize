@@ -162,4 +162,21 @@ class Conexao
             return false;
         }
     }
+
+    //essa funcao buscar no banco os detalhes do nivel de acesso cadastrado
+    //com a condicao da ordem for maior ou igual a do usuario e 
+    // o id por igual ao id do usuario colocando em ordem ascendente.
+    public function buscarDadosNivelAcesso($id){
+        $result = array();
+        $cmd = $this->pdo->prepare("SELECT * FROM adms_niveis_acessos WHERE ordem >= :ordem 
+        AND id=:id ORDER BY ordem ASC LIMIT 1");
+
+        $cmd->bindValue(":ordem", $_SESSION['ordem'], PDO::PARAM_INT);
+        $cmd->bindValue(":id", $id, PDO::PARAM_INT);
+        $cmd->execute();
+        $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+
+
+    }
 }
