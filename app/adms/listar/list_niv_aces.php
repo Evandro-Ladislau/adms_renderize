@@ -105,9 +105,21 @@ include_once 'app/adms/include/head.php';
                                                     Ações
                                                 </button>
                                                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="acoeslistar">
-                                                    <a class="dropdown-item" href="visualizar.html">Visualizar</a>
-                                                    <a class="dropdown-item" href="editar.html">Editar</a>
-                                                    <a class="dropdown-item" data-toggle="modal" data-target="#apagarRegistro" href="apagar.html">Apagar</a>
+                                                    <?php
+                                                        if ($btn_vis) {
+                                                            echo "<a class='dropdown-item' href='" . pg . "/visualizar/vis_niv_aces?id=".$result_paginacaoNivelAcesso[$i]['id']."'>Visualizar</a>";
+                                                        }
+
+                                                        if ($btn_edit) {
+                                                            echo "<a class='dropdown-item' href='" . pg . "/editar/edit_niv_aces?id=".$result_paginacaoNivelAcesso[$i]['id']."'>Editar</a>";
+                                                        }
+
+                                                        if ($btn_apagar) {
+                                                            echo "<a class='dropdown-item' href='" . pg . "/processa/apagar_niv_aces' data-toggle='modal' data-target='#apagarRegistro'>Apagar</a>";
+                                                        }
+
+                                                        
+                                                    ?>
                                                 </div>
                                             </div>
                                         </td>
