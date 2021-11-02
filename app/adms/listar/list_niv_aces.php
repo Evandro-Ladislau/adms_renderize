@@ -35,13 +35,13 @@ include_once 'app/adms/include/head.php';
                     </div>
 
                 </div>
-                <div class="alert alert-success" role="alert">
-                    Usuario Apagado com Sucesso!
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
                 <?php
+                //se cadastrar com sucesso impresse essa variavel global
+                if(isset($_SESSION['msg'])){
+                    echo $_SESSION['msg'];
+                    unset($_SESSION['msg']);
+                }
+
                 //recebe o numero da pagina que o usuario esta
                 $pagina_atual = filter_input(INPUT_GET, 'pagina', FILTER_SANITIZE_NUMBER_INT);
                 $pagina = (!empty($pagina_atual)) ? $pagina_atual : 1;

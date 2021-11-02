@@ -38,6 +38,13 @@ include_once 'app/adms/include/head.php';
                     </div>
                 </div>
                 <hr>
+                <?php
+                //IMPRIME MENSAGEM GLOBAL QUANDO NÃO FOR POSSIVEL CADASTRAR O NIVEL DE ACESSO
+                if(isset($_SESSION['msg'])){
+                    echo $_SESSION['msg'];
+                    unset($_SESSION['msg']);
+                }
+                ?>
             <form method="POST" action="<?php echo pg;?>/processa/proc_cad_niv_aces">
           <div class="form-group">
             <label><span class="text-danger">*</span> Nome</label>

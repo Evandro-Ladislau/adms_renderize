@@ -58,11 +58,13 @@ class Conexao
 
 
     //essa funcao valida o login do usuario
-    public function validarLogin()
+    public function validarLogin($usuario)
     {
         $result = array();
-        $cmd = $this->pdo->query("SELECT id, nome, email, senha , adms_niveis_acesso_id 
-        FROM adms_usuarios  WHERE usuario=usuario LIMIT 1");
+        $cmd = $this->pdo->prepare("SELECT id, nome, email, usuario, senha , adms_niveis_acesso_id 
+        FROM adms_usuarios  WHERE usuario=:usuario LIMIT 1");
+        $cmd->bindValue(":usuario", $usuario, PDO::PARAM_INT);
+        $cmd->execute();
         $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
         return $result;
     }
@@ -177,6 +179,37 @@ class Conexao
         $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
         return $result;
 
+    }
+    //BUSCAR A ORDEM DOS NIVEIS DE ACESSO CADASTRADOS
+    public function ordemCadastrarNivAc(){
+        $result = array();
+        $cmd = $this->pdo->query("SELECT ordem FROM adms_niveis_acessos");
+        $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
 
+    }
+
+    //CADASTRAR NIVEL DE ACESSO
+    public function cadastrarNivelAcesso($dados_validos, $ordem){
+        $cmd = $this->pdo->prepare("INSERT INTO adms_niveis_acessos (nome, ordem, created) 
+        VALUES (:dados, :ordem, NOW()) ");
+        
+        $cmd->bindValue(":dados", $dados_validos, PDO::PARAM_STR);
+        $cmd->bindValue(":ordem", $ordem, PDO::PARAM_INT);
+        $cmd->execute();
+        return true;
+
+    }
+
+    //busca o id do usuario logado que seja igual ao passad pela url
+    public function verificarId($id){
+        $result = array();
+        $cmd = $this->pdo->prepare("SELECT id FROM adms_niveis_acessos WHERE ordem >= :ordem AND id=:id LIMIT 1");
+        $cmd->bindValue(":ordem", $_SESSION['adms_niveis_acesso_id'], PDO::PARAM_INT);
+        $cmd->bindValue(":id", $id, PDO::PARAM_INT);
+        $cmd->execute();
+        $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+        
     }
 }

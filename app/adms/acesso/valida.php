@@ -17,7 +17,7 @@ if ($SendLogin) {
     if (!empty($usuario) and (!empty($senha))) {
         // imprime a senha cripitografada echo password_hash($senha, PASSWORD_DEFAULT);
         //chamda a função que valida o usuario.
-        $result_login = $pdo->validarLogin();
+        $result_login = $pdo->validarLogin($usuario);
         
         //iterei o array colocando os valores nas variaveis globais.
         if ($result_login) {
