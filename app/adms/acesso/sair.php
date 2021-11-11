@@ -7,7 +7,7 @@ if (!isset($seguranca)) {
 require_once './app/adms/models/Conexao.php';
 require_once '../adm/index.php';
 
-unset($_SESSION['id'], $_SESSION['nome'],  $_SESSION['email'], $_SESSION['adms_niveis_acesso_id'], $_SESSION['ordem']);
+unset($_SESSION['id'], $_SESSION['nome'],  $_SESSION['email'],$_SESSION['usuario'], $_SESSION['senha'], $_SESSION['adms_niveis_acesso_id'], $_SESSION['ordem'], $_SESSION['result']);
 $_SESSION['msg'] = "<div class='alert alert-danger'> Deslogado com Sucesso! </div>";
 $url_destino = pg . '/acesso/login';
 header("Location: $url_destino");

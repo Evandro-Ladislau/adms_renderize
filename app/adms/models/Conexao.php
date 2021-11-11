@@ -57,14 +57,12 @@ class Conexao
     }
 
 
-    //essa funcao valida o login do usuario
-    public function validarLogin($usuario)
+    //essa funcao PEGA AS INFORMACOES DO BANO DE DADOS PAR SER COLOCADA NA vARIAVEL GLOBAL
+    public function validarLogin()
     {
         $result = array();
-        $cmd = $this->pdo->prepare("SELECT id, nome, email, usuario, senha , adms_niveis_acesso_id 
-        FROM adms_usuarios  WHERE usuario=:usuario LIMIT 1");
-        $cmd->bindValue(":usuario", $usuario, PDO::PARAM_INT);
-        $cmd->execute();
+        $cmd = $this->pdo->query("SELECT id, nome, email, usuario, senha , adms_niveis_acesso_id 
+        FROM adms_usuarios  WHERE usuario=usuario ");
         $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
         return $result;
     }
@@ -120,8 +118,24 @@ class Conexao
     public function paginacaoNivelAcesso($inicio, $qnt_result_pg)
     {
         $result = array();
+        $cmd = $this->pdo->prepare("SELECT * FROM adms_niveis_acessos  
+        ORDER BY ordem 
+        ASC LIMIT :inicio, :qnt_result_pg");
+        $cmd->bindValue(":inicio", $inicio, PDO::PARAM_INT);
+        $cmd->bindParam(":qnt_result_pg", $qnt_result_pg, PDO::PARAM_INT);
+        $cmd->execute();
+        $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+    }
+
+
+    //Essa pega as informacoes da tabela adms_niveis_acesso onde a ordem do usuario logado seja igual ou menos que os outros usuarios
+    // e limita o resultado do inicio da pagina que ele esta ao valor final de paginas. LIMITANDO CONFORME NIVEL DE ACESSO
+    public function paginacaoNivelAcessoLimitado($inicio, $qnt_result_pg)
+    {
+        $result = array();
         $cmd = $this->pdo->prepare("SELECT * FROM adms_niveis_acessos 
-        WHERE ordem >= :ordem 
+        WHERE ordem > :ordem 
         ORDER BY ordem 
         ASC LIMIT :inicio, :qnt_result_pg");
         $cmd->bindValue(":ordem", $_SESSION['ordem'], PDO::PARAM_INT);
@@ -168,9 +182,25 @@ class Conexao
     //essa funcao buscar no banco os detalhes do nivel de acesso cadastrado
     //com a condicao da ordem for maior ou igual a do usuario e 
     // o id por igual ao id do usuario colocando em ordem ascendente.
-    public function buscarDadosNivelAcesso($id){
+    public function buscarDadosNivelAcesso($id)
+    {
         $result = array();
-        $cmd = $this->pdo->prepare("SELECT * FROM adms_niveis_acessos WHERE ordem >= :ordem 
+        $cmd = $this->pdo->prepare("SELECT * FROM adms_niveis_acessos WHERE id=:id ORDER BY ordem ASC LIMIT 1");
+        $cmd->bindValue(":id", $id, PDO::PARAM_INT);
+        $cmd->execute();
+        $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+    }
+
+
+    //essa funcao buscar no banco os detalhes do nivel de acesso cadastrado
+    //com a condicao da ordem for maior ou igual a do usuario e 
+    // o id por igual ao id do usuario colocando em ordem ascendente.
+    //LIMITADA
+    public function buscarDadosNivelAcessoLimitada($id)
+    {
+        $result = array();
+        $cmd = $this->pdo->prepare("SELECT * FROM adms_niveis_acessos WHERE ordem > :ordem 
         AND id=:id ORDER BY ordem ASC LIMIT 1");
 
         $cmd->bindValue(":ordem", $_SESSION['ordem'], PDO::PARAM_INT);
@@ -178,38 +208,79 @@ class Conexao
         $cmd->execute();
         $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
         return $result;
-
     }
+
     //BUSCAR A ORDEM DOS NIVEIS DE ACESSO CADASTRADOS
-    public function ordemCadastrarNivAc(){
+    public function ordemCadastrarNivAc()
+    {
         $result = array();
         $cmd = $this->pdo->query("SELECT ordem FROM adms_niveis_acessos");
         $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
         return $result;
-
     }
 
     //CADASTRAR NIVEL DE ACESSO
-    public function cadastrarNivelAcesso($dados_validos, $ordem){
+    public function cadastrarNivelAcesso($dados_validos, $ordem)
+    {
         $cmd = $this->pdo->prepare("INSERT INTO adms_niveis_acessos (nome, ordem, created) 
         VALUES (:dados, :ordem, NOW()) ");
-        
+
         $cmd->bindValue(":dados", $dados_validos, PDO::PARAM_STR);
         $cmd->bindValue(":ordem", $ordem, PDO::PARAM_INT);
         $cmd->execute();
         return true;
-
     }
 
     //busca o id do usuario logado que seja igual ao passad pela url
-    public function verificarId($id){
+    public function verificarId($id)
+    {
         $result = array();
-        $cmd = $this->pdo->prepare("SELECT id FROM adms_niveis_acessos WHERE ordem >= :ordem AND id=:id LIMIT 1");
+        $cmd = $this->pdo->prepare("SELECT id, nome FROM adms_niveis_acessos WHERE ordem > :ordem AND id=:id LIMIT 1");
         $cmd->bindValue(":ordem", $_SESSION['adms_niveis_acesso_id'], PDO::PARAM_INT);
         $cmd->bindValue(":id", $id, PDO::PARAM_INT);
         $cmd->execute();
         $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
         return $result;
-        
     }
+
+    public function alterarNivelAcesso($nome, $id){
+        
+        $cmd = $this->pdo->prepare("UPDATE adms_niveis_acessos SET nome=:nome, modified=NOW() 
+        WHERE id=:id ");
+        $cmd->bindValue(":nome", $nome, PDO::PARAM_STR);
+        $cmd->bindValue(":id", $id, PDO::PARAM_INT);
+        $cmd->execute();
+        return true;
+    }
+
+    public function buscarOrdemDoNivelDeletado($id){
+        $result = array();
+        $cmd = $this->pdo->prepare("SELECT id, ordem AS ordem_result 
+        FROM adms_niveis_acessos 
+        WHERE ordem > (SELECT ordem FROM adms_niveis_acessos WHERE id=:id) ORDER BY ordem ASC");
+        $cmd->bindValue(":id", $id);
+        $cmd->execute();
+        $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+    }
+
+    public function deletarNivelAcesso($id){
+        $cmd = $this->pdo->prepare("DELETE FROM adms_niveis_acessos WHERE id=:id AND ordem > :ordem ");
+        $cmd->bindValue(":id", $id, PDO::PARAM_INT);
+        $cmd->bindValue(":ordem", $_SESSION['ordem'], PDO::PARAM_INT);
+        $cmd->execute();
+        return true;
+    }
+
+    public function atualizaOrdem($ordem, $id){
+        $cmd = $this->pdo->prepare("UPDATE  adms_niveis_acessos SET 
+        ordem=:ordem, modified=NOW()
+        WHERE id=:id");
+        $cmd->bindValue(":ordem", $ordem);
+        $cmd->bindValue(":id", $id);
+        $cmd->execute();
+        return true;
+    }
+
+    
 }

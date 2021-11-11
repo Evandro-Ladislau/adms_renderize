@@ -18,8 +18,14 @@ include_once 'app/adms/include/head.php';
         include_once 'app/adms/include/menu.php';
         //pegar o id pega url
         $id = filter_input(INPUT_GET, 'id', FILTER_SANITIZE_NUMBER_INT);
+
+        if($_SESSION['adms_niveis_acesso_id'] == 1){
         //chama a funcao buscarDadosNivelAcesso
         $result_niv_aces = $pdo->buscarDadosNivelAcesso($id);
+
+        }else{
+            $result_niv_aces = $pdo->buscarDadosNivelAcessoLimitada($id);
+        }
 
         $pagina_atual = filter_input(INPUT_GET, 'pagina', FILTER_SANITIZE_NUMBER_INT);
         $pagina = (!empty($pagina_atual)) ? $pagina_atual : 1;

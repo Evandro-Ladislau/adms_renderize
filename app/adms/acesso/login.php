@@ -14,6 +14,7 @@ include_once 'app/adms/include/head_login.php';
         if(isset($_SESSION['msg'])){
             echo $_SESSION['msg'];
             unset($_SESSION['msg']);
+           
         }
         ?>
         <div class="form-group">

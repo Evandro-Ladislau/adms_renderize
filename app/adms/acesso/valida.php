@@ -1,5 +1,5 @@
 <?php
-if(!isset($seguranca)){
+if (!isset($seguranca)) {
     exit;
 }
 require_once './app/adms/models/Conexao.php';
@@ -14,22 +14,36 @@ if ($SendLogin) {
     $senha_rc = filter_input(INPUT_POST, 'senha', FILTER_SANITIZE_STRING);
     $senha = str_ireplace(" ", "", $senha_rc);
 
+    //ESSA FUNCAO CHAMA OS USUARIOS EXISTENTE NO BANCO
+    //COM ESSES VALORES QUE SERA FEITO A LOGICA PARA O LOGIN
+
+
+
     if (!empty($usuario) and (!empty($senha))) {
         // imprime a senha cripitografada echo password_hash($senha, PASSWORD_DEFAULT);
         //chamda a função que valida o usuario.
-        $result_login = $pdo->validarLogin($usuario);
-        
+        $result_login = $pdo->validarLogin();
+
+
+
         //iterei o array colocando os valores nas variaveis globais.
         if ($result_login) {
 
             for ($i = 0; $i < count($result_login); $i++) {
-
                 //Com esse for pego o resultado de cada um dessas colunas e coloco dentro da variavel global.
-                $_SESSION['id'] = $result_login[$i]['id'];
-                $_SESSION['nome'] = $result_login[$i]['nome'];
-                $_SESSION['email'] = $result_login[$i]['email'];
-                $_SESSION['senha'] = $result_login[$i]['senha'];
-                $_SESSION['adms_niveis_acesso_id'] = $result_login[$i]['adms_niveis_acesso_id'];
+
+                //com esse for each eu verifico se o valor da variavel de cada posicao da matriz
+                //é igual ao usuario. se sim ele coloca nas variaveis globais
+                foreach ($result_login[$i] as $value) {
+                    if ($usuario == $value) {
+                        $_SESSION['id'] = $result_login[$i]['id'];
+                        $_SESSION['nome'] = $result_login[$i]['nome'];
+                        $_SESSION['email'] = $result_login[$i]['email'];
+                        $_SESSION['usuario'] = $result_login[$i]['usuario'];
+                        $_SESSION['senha'] = $result_login[$i]['senha'];
+                        $_SESSION['adms_niveis_acesso_id'] = $result_login[$i]['adms_niveis_acesso_id'];
+                    }
+                }
             }
 
             //aqui chamei a funcao que busca a coluna ordem do nivel de acesso e coloquei o valor dentro da variavel global.
@@ -59,7 +73,7 @@ if ($SendLogin) {
     //esse erro acontece caso haja uma tentativa de acessar o arquivo sem clicar no botão.
 
     //variavel global para criar uma mensagem de alerta.
-    $_SESSION['msg'] = "<div class='alert alert-danger'> Página não encontrada!</div>";
+    $_SESSION['msg'] = "<div class='alert alert-danger'> Página não encontrada! </div>";
     $url_destino = pg . '/acesso/login';
     header("Location: $url_destino");
 }

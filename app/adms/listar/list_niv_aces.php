@@ -40,6 +40,7 @@ include_once 'app/adms/include/head.php';
                 if(isset($_SESSION['msg'])){
                     echo $_SESSION['msg'];
                     unset($_SESSION['msg']);
+                    
                 }
 
                 //recebe o numero da pagina que o usuario esta
@@ -52,8 +53,14 @@ include_once 'app/adms/include/head.php';
                 //calcular o inicio visualização
                 $inicio = ($qnt_result_pg * $pagina) - $qnt_result_pg;
 
-                //chamei a funcao que busca a paginacao conforme nivel de acesso.
+                if($_SESSION['adms_niveis_acesso_id'] == 1){
+                    //chamei a funcao que busca a paginacao conforme nivel de acesso.
                 $result_paginacaoNivelAcesso = $pdo->paginacaoNivelAcesso($inicio, $qnt_result_pg);
+
+                }else{
+                    $result_paginacaoNivelAcesso = $pdo->paginacaoNivelAcessoLimitado($inicio, $qnt_result_pg);
+                }
+                
                 if ($result_paginacaoNivelAcesso) {
                 ?>
                     <div class="table-responsive">
@@ -96,7 +103,7 @@ include_once 'app/adms/include/head.php';
                                                 $btn_apagar = $pdo->carregarBtn('processa/apagar_niv_aces');
 
                                                 if ($btn_apagar) {
-                                                    echo "<a href='" . pg . "/processa/apagar_niv_aces' class='btn btn-outline-danger btn-sm' data-toggle='modal' data-target='#apagarRegistro'>Apagar</a>";
+                                                    echo "<a href='" . pg . "/processa/apagar_niv_aces?id=".$result_paginacaoNivelAcesso[$i]['id']."' class='btn btn-outline-danger btn-sm'>Apagar</a>";
                                                 }
                                                 ?>
                                             </span>

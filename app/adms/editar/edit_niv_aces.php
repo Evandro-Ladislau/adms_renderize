@@ -14,7 +14,7 @@ if ($id) {
 
     //chama a funcao que verifica se existe id no bd
     $resultID = $pdo->verificarId($id);
-    
+
     //se existir ele acessa esse if e impreme a pagina
     if ($resultID) {
 
@@ -59,13 +59,26 @@ if ($id) {
                             unset($_SESSION['msg']);
                         }
                         ?>
-                        <form method="POST" action="<?php echo pg; ?>/processa/proc_cad_niv_aces">
+                        <form method="POST" action="<?php echo pg; ?>/processa/proc_edit_niv_aces">
+                            <input type="hidden" name="id" value="<?php if (isset($resultID)) {
+                                                                        for ($i = 0; $i < count($resultID); $i++) {
+                                                                            echo $resultID[$i]['id'];
+                                                                        }
+                                                                    } ?>">
                             <div class="form-group">
                                 <label><span class="text-danger">*</span> Nome</label>
-                                <input name="nome" type="text" class="form-control" placeholder="Nome do Nível de Acesso">
+                                <input name="nome" type="text" class="form-control" placeholder="Nome do Nível de Acesso" value="<?php
+                                                                                                                                    if (isset($resultID)) {
+                                                                                                                                        for ($i = 0; $i < count($resultID); $i++) {
+                                                                                                                                            echo $resultID[$i]['nome'];
+                                                                                                                                        }
+                                                                                                                                    }
+
+                                                                                                                                    ?>
+                                ">
                             </div>
                             <p><span class="text-danger">*</span> Campo Obrogatório</p>
-                            <input name="SendCadNivAc" type="submit" class="btn btn-success" value="Cadastrar">
+                            <input name="SendEditNivAC" type="submit" class="btn btn-warning" value="Salvar">
                         </form>
 
                     </div>
@@ -78,7 +91,7 @@ if ($id) {
             </div>
         </body>
 <?php
-//se nao redireciona para a pagina listar
+        //se nao redireciona para a pagina listar
     } else {
         $_SESSION['msg'] = "<div class='alert alert-danger'> Nível de acesso Não encontrado! <button type='button' class='close' data-dismiss='alert' aria-label='Close'>
     <span aria-hidden='true'>&times;</span>
