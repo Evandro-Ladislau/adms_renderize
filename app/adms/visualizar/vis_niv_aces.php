@@ -53,21 +53,21 @@ include_once 'app/adms/include/head.php';
                                 $btn_list = $pdo->carregarBtn('listar/list_niv_aces');
 
                                 if ($btn_list) {
-                                    echo "<a href='" . pg . "/listar/list_niv_aces?id=" . $result_paginacaoNivelAcesso[$i]['id'] . "' class='btn btn-outline-info btn-sm'>Listar</a>";
+                                    echo "<a href='" . pg . "/listar/list_niv_aces?id=" . $result_niv_aces[$i]['id'] . "' class='btn btn-outline-info btn-sm'>Listar</a>";
                                 }
 
                                 //BOTAR EDITAR
                                 $btn_edit = $pdo->carregarBtn('editar/edit_niv_aces');
 
                                 if ($btn_edit) {
-                                    echo "<a href='" . pg . "/editar/edit_niv_aces?id=" . $result_paginacaoNivelAcesso[$i]['id'] . "' class='btn btn-outline-warning btn-sm'>Editar</a>";
+                                    echo " <a href='" . pg . "/editar/edit_niv_aces?id=" . $result_niv_aces[$i]['id'] . "' class='btn btn-outline-warning btn-sm'>Editar</a>";
                                 }
 
                                 //BOTAO PAGAR
                                 $btn_apagar = $pdo->carregarBtn('processa/apagar_niv_aces');
 
                                 if ($btn_apagar) {
-                                    echo "<a href='" . pg . "/processa/apagar_niv_aces' class='btn btn-outline-danger btn-sm' data-toggle='modal' data-target='#apagarRegistro'>Apagar</a>";
+                                    echo " <a href='" . pg . "/processa/apagar_niv_aces?id=". $result_niv_aces[$i]['id'] ."' class='btn btn-outline-danger btn-sm' data-confirm='Tem Certeza que deseja excluir o item?'>Apagar</a>";
                                 }
                                 ?>
                             </span>
@@ -78,15 +78,15 @@ include_once 'app/adms/include/head.php';
                                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="acoeslistar">
                                     <?php
                                     if ($btn_list) {
-                                        echo "<a class='dropdown-item' href='" . pg . "/listar/list_niv_aces?id=" . $result_paginacaoNivelAcesso[$i]['id'] . "'>Listar</a>";
+                                        echo "<a class='dropdown-item' href='" . pg . "/listar/list_niv_aces?id=" . $result_niv_aces[$i]['id'] . "'>Listar</a>";
                                     }
 
                                     if ($btn_edit) {
-                                        echo "<a class='dropdown-item' href='" . pg . "/editar/edit_niv_aces?id=" . $result_paginacaoNivelAcesso[$i]['id'] . "'>Editar</a>";
+                                        echo "<a class='dropdown-item' href='" . pg . "/editar/edit_niv_aces?id=" . $result_niv_aces[$i]['id'] . "'>Editar</a>";
                                     }
 
                                     if ($btn_apagar) {
-                                        echo "<a class='dropdown-item' href='" . pg . "/processa/apagar_niv_aces' data-toggle='modal' data-target='#apagarRegistro'>Apagar</a>";
+                                        echo "<a class='dropdown-item' href='" . pg . "/processa/apagar_niv_aces?id=". $result_niv_aces[$i]['id'] ."' data-confirm='Tem Certeza que deseja excluir o item?'>Apagar</a>";
                                     }
 
 

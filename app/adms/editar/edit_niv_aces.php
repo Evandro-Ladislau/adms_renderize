@@ -39,16 +39,57 @@ if ($id) {
                                 <h2 class="display-4 titulo">Editar Nível de Acesso</h2>
                             </div>
                             <div class="p-2">
-                                <?php
-                                //BOTAO VISUALIZAE
-                                $btn_list = $pdo->carregarBtn('listar/list_niv_aces');
+                                <span class="d-none d-md-block">
+                                    <?php
 
-                                if ($btn_list) {
-                                    echo "<a href='" . pg . "/listar/list_niv_aces?id=" . $_SESSION['id'] . "' class='btn btn-outline-info btn-sm'>Listar</a>";
-                                }
+                                    for ($i=0; $i <count($resultID) ; $i++) { 
+                                       //BOTAO LISTAR
+                                    $btn_list = $pdo->carregarBtn('listar/list_niv_aces');
+
+                                    if ($btn_list) {
+                                        echo "<a href='" . pg . "/listar/list_niv_aces?id=" . $resultID[$i]['id'] . "' class='btn btn-outline-info btn-sm'>Listar</a>";
+                                    }
+
+                                    //BOTAR EDITAR
+                                    $btn_vis = $pdo->carregarBtn('visualizar/vis_niv_aces');
+
+                                    if ($btn_vis) {
+                                        echo " <a href='" . pg . "/visualizar/vis_niv_aces?id=" . $resultID[$i]['id'] . "' class='btn btn-outline-primary btn-sm'>visualizar</a>";
+                                    }
+
+                                    //BOTAO PAGAR
+                                    $btn_apagar = $pdo->carregarBtn('processa/apagar_niv_aces');
+
+                                    if ($btn_apagar) {
+                                        echo " <a href='" . pg . "/processa/apagar_niv_aces?id=" . $resultID[$i]['id'] . "' class='btn btn-outline-danger btn-sm' data-confirm='Tem Certeza que deseja excluir o item?'>Apagar</a>";
+                                    }
+                                    ?>
+                                </span>
+                                <div class="dropdown d-block d-md-none">
+                                    <button class="btn btn-primary dropdown-toggle btn-sm" type="button" id="acoeslistar" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        Ações
+                                    </button>
+                                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="acoeslistar">
+                                        <?php
+                                        if ($btn_list) {
+                                            echo "<a class='dropdown-item' href='" . pg . "/listar/list_niv_aces?id=" . $resultID[$i]['id'] . "'>Listar</a>";
+                                        }
+
+                                        if ($btn_vis) {
+                                            echo "<a class='dropdown-item' href='" . pg . "visualizar/vis_niv_aces?id=" . $resultID[$i]['id'] . "'>visualizar</a>";
+                                        }
+
+                                        if ($btn_apagar) {
+                                            echo "<a class='dropdown-item' href='" . pg . "/processa/apagar_niv_aces?id=" . $_SESSION['id'] . "' data-confirm='Tem Certeza que deseja excluir o item?'>Apagar</a>";
+                                        }
 
 
-                                ?>
+                                        ?>
+                                    </div>
+                                    <?php
+                                    }
+                                    ?>
+                                </div>
                             </div>
                         </div>
                         <hr>

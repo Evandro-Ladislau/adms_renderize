@@ -32,7 +32,7 @@ if ($SendLogin) {
             for ($i = 0; $i < count($result_login); $i++) {
                 //Com esse for pego o resultado de cada um dessas colunas e coloco dentro da variavel global.
 
-                //com esse for each eu verifico se o valor da variavel de cada posicao da matriz
+                //com esse foreach eu verifico se o valor da variavel de cada posicao da matriz
                 //é igual ao usuario. se sim ele coloca nas variaveis globais
                 foreach ($result_login[$i] as $value) {
                     if ($usuario == $value) {

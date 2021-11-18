@@ -276,11 +276,48 @@ class Conexao
         $cmd = $this->pdo->prepare("UPDATE  adms_niveis_acessos SET 
         ordem=:ordem, modified=NOW()
         WHERE id=:id");
-        $cmd->bindValue(":ordem", $ordem);
-        $cmd->bindValue(":id", $id);
+        $cmd->bindValue(":ordem", $ordem, PDO::PARAM_INT);
+        $cmd->bindValue(":id", $id, PDO::PARAM_INT);
         $cmd->execute();
         return true;
     }
 
+    public function verificarNivelCadastradoUsuario($id){
+        $result = array();
+        $cmd = $this->pdo->prepare("SELECT id FROM adms_usuarios WHERE adms_niveis_acesso_id=:id LIMIT 1 ");
+        $cmd->bindValue("id", $id, PDO::PARAM_INT);
+        $cmd->execute();
+        $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+
+
+
+    }
+
+    public function alterarOrdemNivelAcesso($id){
+        $result = array();
+        $cmd = $this->pdo->prepare("SELECT id, ordem FROM adms_niveis_acessos WHERE id=:id LIMIT 1");
+        $cmd->bindValue(":id", $id, PDO::PARAM_INT);
+        $cmd->execute();
+        $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+    }
     
+    public function pesquisarIdNivelAcessoMovido($ordem_super){
+        $result = array();
+        $cmd = $this->pdo->prepare("SELECT id, ordem FROM adms_niveis_acessos WHERE ordem=:ordem_super LIMIT 1");
+        $cmd->bindValue(":ordem_super", $ordem_super, PDO::PARAM_INT);
+        $cmd->execute();
+        $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+    }
+
+    public function altualizaOrdemNivelAcesso($ordem, $niv_super){
+        $cmd = $this->pdo->prepare("UPDATE adms_niveis_acessos SET ordem=:ordem, modified=NOW() 
+        WHERE id=:niv_super");
+        $cmd->bindValue(":ordem", $ordem, PDO::PARAM_INT);
+        $cmd->bindValue(":niv_super", $niv_super, PDO::PARAM_INT);
+        $cmd->execute();
+        return true;
+    }
 }

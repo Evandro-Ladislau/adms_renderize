@@ -40,7 +40,7 @@ if ($sendCadNivAc) {
             $url_destino = pg . '/listar/list_niv_aces';
             header("Location: $url_destino");
         } else {
-            $_SESSION['msg'] = "<div class='alert alert-danger'> Erro a inerir o nível de acesso! <button type='button' class='close' data-dismiss='alert' aria-label='Close'>
+            $_SESSION['msg'] = "<div class='alert alert-danger'> Erro a inserir o nível de acesso! <button type='button' class='close' data-dismiss='alert' aria-label='Close'>
             <span aria-hidden='true'>&times;</span>
         </button></div>";
             $url_destino = pg . '/cadastrar/cad_niv_aces';

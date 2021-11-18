@@ -40,7 +40,9 @@ include_once 'app/adms/include/head.php';
                 if(isset($_SESSION['msg'])){
                     echo $_SESSION['msg'];
                     unset($_SESSION['msg']);
-                    
+
+                    var_dump($_SESSION['resut']);
+                    unset($_SESSION['resut']);
                 }
 
                 //recebe o numero da pagina que o usuario esta
@@ -75,7 +77,10 @@ include_once 'app/adms/include/head.php';
                             </thead>
                             <tbody>
                                 <?php
-                                //pegando as informações do nivel de acesso cadastradas no banco de dados.
+                                //qntidades de linhas executadas, se for igual a 1 quer dizer e o primeiro
+                                //sendo o primeiro ele não imprime
+                                $qnt_linhas_exe = 1;
+                                //pegando as informações do nivel de acesso cadastradas no banco de dados.     
                                 for ($i = 0; $i < count($result_paginacaoNivelAcesso); $i++) {
                                 ?>
                                     <tr>
@@ -85,25 +90,37 @@ include_once 'app/adms/include/head.php';
                                         <td class="text-center">
                                             <span class="d-none d-md-block">
                                                 <?php
+                                                $btn_or_nivac = $pdo->carregarBtn('processa/proc_ordem_niv_aces');
+
+                                                if ($qnt_linhas_exe == 1) {
+                                                    if ($btn_or_nivac) {
+                                                        echo "<button class='btn btn-outline-secondary btn-sm disabled'><i class='fas fa-angle-double-up'></i></button>";
+                                                    }
+                                                }else{
+                                                    if ($btn_or_nivac) {
+                                                        echo "<a href='" . pg . "/processa/proc_ordem_niv_aces?id=".$result_paginacaoNivelAcesso[$i]['id']."' class='btn btn-outline-secondary btn-sm'><i class='fas fa-angle-double-up'></i></a>";
+                                                    }
+                                                }
+                                                $qnt_linhas_exe++;
                                                 //BOTAO VISUALIZAE
                                                 $btn_vis = $pdo->carregarBtn('visualizar/vis_niv_aces');
 
                                                 if ($btn_vis) {
-                                                    echo "<a href='" . pg . "/visualizar/vis_niv_aces?id=".$result_paginacaoNivelAcesso[$i]['id']."' class='btn btn-outline-primary btn-sm'>Visualizar</a>";
+                                                    echo " <a href='" . pg . "/visualizar/vis_niv_aces?id=".$result_paginacaoNivelAcesso[$i]['id']."' class='btn btn-outline-primary btn-sm'> Visualizar </a>";
                                                 }
 
                                                 //BOTAR EDITAR
                                                 $btn_edit = $pdo->carregarBtn('editar/edit_niv_aces');
 
                                                 if ($btn_edit) {
-                                                    echo "<a href='" . pg . "/editar/edit_niv_aces?id=".$result_paginacaoNivelAcesso[$i]['id']."' class='btn btn-outline-warning btn-sm'>Editar</a>";
+                                                    echo " <a href='" . pg . "/editar/edit_niv_aces?id=".$result_paginacaoNivelAcesso[$i]['id']."' class='btn btn-outline-warning btn-sm' > Editar </a>";
                                                 }
 
                                                 //BOTAO PAGAR
                                                 $btn_apagar = $pdo->carregarBtn('processa/apagar_niv_aces');
 
                                                 if ($btn_apagar) {
-                                                    echo "<a href='" . pg . "/processa/apagar_niv_aces?id=".$result_paginacaoNivelAcesso[$i]['id']."' class='btn btn-outline-danger btn-sm'>Apagar</a>";
+                                                    echo " <a href='" . pg . "/processa/apagar_niv_aces?id=".$result_paginacaoNivelAcesso[$i]['id']."' class='btn btn-outline-danger btn-sm' data-confirm='Tem Certeza que deseja excluir o item?'> Apagar </a>";
                                                 }
                                                 ?>
                                             </span>
@@ -122,7 +139,7 @@ include_once 'app/adms/include/head.php';
                                                         }
 
                                                         if ($btn_apagar) {
-                                                            echo "<a class='dropdown-item' href='" . pg . "/processa/apagar_niv_aces' data-toggle='modal' data-target='#apagarRegistro'>Apagar</a>";
+                                                            echo "<a class='dropdown-item' href='" . pg . "/processa/apagar_niv_aces?id=".$result_paginacaoNivelAcesso[$i]['id']."' data-confirm='Tem Certeza que deseja excluir o item?'>Apagar</a>";
                                                         }
 
                                                         

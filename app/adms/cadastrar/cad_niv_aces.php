@@ -43,7 +43,7 @@ include_once 'app/adms/include/head.php';
                 if(isset($_SESSION['msg'])){
                     echo $_SESSION['msg'];
                     unset($_SESSION['msg']);
-                    var_dump($_SESSION['result']);
+                    
                 }
                 ?>
             <form method="POST" action="<?php echo pg;?>/processa/proc_cad_niv_aces">

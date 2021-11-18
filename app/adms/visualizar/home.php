@@ -49,7 +49,7 @@ include_once 'app/adms/include/head.php';
                         <div class="card bg-warning text-white">
                             <div class="card-body">
                                 <i class="fas fa-eye fa-3x"></i>
-                                <h6 class="card-title">Vizitas</h6>
+                                <h6 class="card-title">Visitas</h6>
                                 <h2 class="lead">369</h2>
                             </div>
                         </div>
