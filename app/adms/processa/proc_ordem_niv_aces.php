@@ -25,14 +25,25 @@ if (!empty($id)) {
               $result_niv_super = $pdo->pesquisarIdNivelAcessoMovido($ordem_super);
 
               //Alterar a ordem para o numero ser maior
-              $result_niv_mv_baixo = $pdo->altualizaOrdemNivelAcesso($ordem, $result_niv_super[$i]['id']);
+              $result_niv_mv_baixo = $pdo->altualizaOrdemNivelAcessoMaior($ordem, $result_niv_super[$i]['id']);
 
               //alterar a ordem para o número ser maior
+              $result_niv_mv_super = $pdo->altualizaOrdemNivelAcessoMenor($ordem_super, $resultado_niv_atual[$i]['id']);
               
+              //redirecionar conforme a situação do alterar: sucesso ou erro
+              if ($result_niv_mv_super) {
+                $_SESSION['msg'] = "<div class='alert alert-success'> Ordem do Nível de Acesso editado com sucesso! </div>";
+                $url_destino = pg . '/listar/list_niv_aces';
+                header("Location: $url_destino");
+              }else{
+                $_SESSION['msg'] = "<div class='alert alert-danger'> Erro ao editar a ordem do Nível de Acesso! </div>";
+                $url_destino = pg . '/listar/list_niv_aces';
+                header("Location: $url_destino");
+              }
 
 
            }else{
-            $_SESSION['msg'] = "<div class='alert alert-danger'> Nível de Acesso não encontrado! </div>";
+            $_SESSION['msg'] = "<div class='alert alert-danger'> Nível de Acesso não pode ser alterado! </div>";
             $url_destino = pg . '/listar/list_niv_aces';
             header("Location: $url_destino");
            }

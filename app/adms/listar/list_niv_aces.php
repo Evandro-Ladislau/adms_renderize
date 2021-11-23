@@ -41,8 +41,6 @@ include_once 'app/adms/include/head.php';
                     echo $_SESSION['msg'];
                     unset($_SESSION['msg']);
 
-                    var_dump($_SESSION['resut']);
-                    unset($_SESSION['resut']);
                 }
 
                 //recebe o numero da pagina que o usuario esta

@@ -31,7 +31,7 @@ if ($result_paginas) {
 
     //neste caso eu percorri o array matriz e mandei ele trazer o cadastro da pagina na posição do $i/nome da coluna
     for ($i = 0; $i < count($result_paginas); $i++) {
-        $file = 'app/' . $result_paginas[$i]['tp_pagina'] . '/' . $result_paginas[$i]['endereco'] . '.php';
+        $file = 'app/' . $result_paginas[$i]['tipo'] . '/' . $result_paginas[$i]['endereco'] . '.php';
     }
 
 

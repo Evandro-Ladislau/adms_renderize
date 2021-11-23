@@ -40,9 +40,11 @@ class Conexao
             $adms_niveis_acesso_id = 0;
         }
 
-        $cmd = $this->pdo->prepare("SELECT pg.id, pg.tp_pagina, pg.endereco 
+        $cmd = $this->pdo->prepare("SELECT pg.id, pg.endereco ,
+        tpg.tipo
         FROM adms_paginas pg
         LEFT JOIN adms_nivacs_pgs nivpg ON nivpg.adms_pagina_id=pg.id
+        INNER JOIN adms_tps_pg tpg ON tpg.id=pg.adms_tps_pg_id
         WHERE pg.endereco=:endereco
         AND (pg.adms_sits_pg_id=1
         AND (nivpg.adms_niveis_acesso_id=:adms_niveis_acesso_id	
@@ -158,7 +160,7 @@ class Conexao
     public function carregarBtn($endereco)
     {
         $result = array();
-        $cmd = $this->pdo->prepare("SELECT pg.id, pg.tp_pagina, pg.endereco 
+        $cmd = $this->pdo->prepare("SELECT pg.id, pg.endereco 
         FROM adms_paginas pg
         LEFT JOIN adms_nivacs_pgs nivpg ON nivpg.adms_pagina_id=pg.id
         WHERE pg.endereco=:endereco
@@ -312,7 +314,7 @@ class Conexao
         return $result;
     }
 
-    public function altualizaOrdemNivelAcesso($ordem, $niv_super){
+    public function altualizaOrdemNivelAcessoMaior($ordem, $niv_super){
         $cmd = $this->pdo->prepare("UPDATE adms_niveis_acessos SET ordem=:ordem, modified=NOW() 
         WHERE id=:niv_super");
         $cmd->bindValue(":ordem", $ordem, PDO::PARAM_INT);
@@ -320,4 +322,120 @@ class Conexao
         $cmd->execute();
         return true;
     }
+
+    
+    public function altualizaOrdemNivelAcessoMenor($ordem_super, $ordem_niv_atual){
+        $cmd = $this->pdo->prepare("UPDATE adms_niveis_acessos SET ordem=:ordem_super, modified=NOW() 
+        WHERE id=:ordem_niv_atual");
+        $cmd->bindValue(":ordem_super", $ordem_super, PDO::PARAM_INT);
+        $cmd->bindValue(":ordem_niv_atual", $ordem_niv_atual, PDO::PARAM_INT);
+        $cmd->execute();
+        return true;
+    }
+
+    public function paginacaoNivelAcessoPaginas($inicio, $qnt_result_pg)
+    {
+        $result = array();
+        $cmd = $this->pdo->prepare("SELECT pg.id, pg.nome_pagina, pg.endereco,
+        tpg.tipo
+        FROM adms_paginas pg
+        INNER JOIN adms_tps_pg tpg ON tpg.id=adms_tps_pg_id
+        ORDER BY id 
+        ASC LIMIT :inicio, :qnt_result_pg");
+        $cmd->bindValue(":inicio", $inicio, PDO::PARAM_INT);
+        $cmd->bindParam(":qnt_result_pg", $qnt_result_pg, PDO::PARAM_INT);
+        $cmd->execute();
+        $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+    }
+
+    //funcao count conta a coluna id e o resultado é atribuido para um apelido(num_result).
+    public function paginacaoPaginas()
+    {
+        $result = array();
+        $cmd = $this->pdo->query("SELECT COUNT(id) AS num_result FROM adms_paginas");
+        $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+    }
+
+    //listar opçoes buscadores no cadatro de pagina "Indexar"
+    public function listarRobots(){
+
+        $result = array();
+        $cmd = $this->pdo->query("SELECT id, nome FROM adms_robots ");
+        $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+
+    }
+
+    
+    //listar opçoes dependentes no cadatro de pagina "Dependentes"
+    public function listarDependentes(){
+        $result = array();
+        $cmd = $this->pdo->query("SELECT id, nome_pagina FROM adms_paginas ORDER BY nome_pagina ASC");
+        $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+    }
+
+    //listar opçoes grupos no cadatro de pagina "Grupo"
+    public function listarGrupos(){
+        $result = array();
+        $cmd = $this->pdo->query("SELECT id, nome FROM adms_grps_pgs ORDER BY nome ASC");
+        $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+    }
+
+    //listar opçoes tipos de paginas no cadatro de pagina "Tipos"
+    public function listarTiposPaginas(){
+        $result = array();
+        $cmd = $this->pdo->query("SELECT id, tipo, nome FROM  adms_tps_pg ORDER BY nome ASC");
+        $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+    }
+
+    //listar opçoes tipos de paginas no cadatro de pagina "Tipos"
+    public function listarSituacaoPaginas(){
+        $result = array();
+        $cmd = $this->pdo->query("SELECT id, nome FROM  adms_sits_pgs ORDER BY nome ASC");
+        $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+    }
+
+    public function cadastrarPagina($nome_pagina,$endereco,$obs,$keywords,$descriptio,$author,
+    $lib_pub, $icone, $depend_pg, $adms_grps_pg_id, $adms_tps_pg_id, 
+    $adms_robot_id, $adms_sits_pg_id
+    )
+    
+    {
+
+        $cmd = $this->pdo->prepare("INSERT INTO  adms_paginas 
+        (nome_pagina, endereco, obs, keywords, descriptio, author, 
+        lib_pub, icone, depend_pg, adms_grps_pg_id, adms_tps_pg_id, 
+        adms_robot_id, adms_sits_pg_id, created )
+
+        VALUES (:nome_pagina, :endereco, :obs, :keywords, :descriptio, :author, 
+        :lib_pub, :icone, :depend_pg, :adms_grps_pg_id, :adms_tps_pg_id, :adms_robot_id, :adms_sits_pg_id, NOW()) ");
+
+        $cmd->bindValue(":nome_pagina", $nome_pagina);
+        $cmd->bindValue(":endereco", $endereco);
+        $cmd->bindValue(":obs", $obs);
+        $cmd->bindValue(":keywords", $keywords);
+        $cmd->bindValue(":descriptio", $descriptio);
+        $cmd->bindValue(":author", $author);
+
+        $cmd->bindValue(":lib_pub", $lib_pub);
+        $cmd->bindValue(":icone", $icone);
+        $cmd->bindValue(":depend_pg", $depend_pg);
+        $cmd->bindValue(":adms_grps_pg_id", $adms_grps_pg_id);
+        $cmd->bindValue(":adms_tps_pg_id", $adms_tps_pg_id);
+        
+        $cmd->bindValue(":adms_robot_id", $adms_robot_id);
+        $cmd->bindValue(":adms_sits_pg_id", $adms_sits_pg_id);
+        $cmd->execute();
+        return true;
+    }
+    
+
+
+    
 }
