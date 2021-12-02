@@ -245,8 +245,9 @@ class Conexao
         return $result;
     }
 
-    public function alterarNivelAcesso($nome, $id){
-        
+    public function alterarNivelAcesso($nome, $id)
+    {
+
         $cmd = $this->pdo->prepare("UPDATE adms_niveis_acessos SET nome=:nome, modified=NOW() 
         WHERE id=:id ");
         $cmd->bindValue(":nome", $nome, PDO::PARAM_STR);
@@ -255,7 +256,8 @@ class Conexao
         return true;
     }
 
-    public function buscarOrdemDoNivelDeletado($id){
+    public function buscarOrdemDoNivelDeletado($id)
+    {
         $result = array();
         $cmd = $this->pdo->prepare("SELECT id, ordem AS ordem_result 
         FROM adms_niveis_acessos 
@@ -266,7 +268,8 @@ class Conexao
         return $result;
     }
 
-    public function deletarNivelAcesso($id){
+    public function deletarNivelAcesso($id)
+    {
         $cmd = $this->pdo->prepare("DELETE FROM adms_niveis_acessos WHERE id=:id AND ordem > :ordem ");
         $cmd->bindValue(":id", $id, PDO::PARAM_INT);
         $cmd->bindValue(":ordem", $_SESSION['ordem'], PDO::PARAM_INT);
@@ -274,7 +277,8 @@ class Conexao
         return true;
     }
 
-    public function atualizaOrdem($ordem, $id){
+    public function atualizaOrdem($ordem, $id)
+    {
         $cmd = $this->pdo->prepare("UPDATE  adms_niveis_acessos SET 
         ordem=:ordem, modified=NOW()
         WHERE id=:id");
@@ -284,19 +288,18 @@ class Conexao
         return true;
     }
 
-    public function verificarNivelCadastradoUsuario($id){
+    public function verificarNivelCadastradoUsuario($id)
+    {
         $result = array();
         $cmd = $this->pdo->prepare("SELECT id FROM adms_usuarios WHERE adms_niveis_acesso_id=:id LIMIT 1 ");
         $cmd->bindValue("id", $id, PDO::PARAM_INT);
         $cmd->execute();
         $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
         return $result;
-
-
-
     }
 
-    public function alterarOrdemNivelAcesso($id){
+    public function alterarOrdemNivelAcesso($id)
+    {
         $result = array();
         $cmd = $this->pdo->prepare("SELECT id, ordem FROM adms_niveis_acessos WHERE id=:id LIMIT 1");
         $cmd->bindValue(":id", $id, PDO::PARAM_INT);
@@ -304,8 +307,9 @@ class Conexao
         $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
         return $result;
     }
-    
-    public function pesquisarIdNivelAcessoMovido($ordem_super){
+
+    public function pesquisarIdNivelAcessoMovido($ordem_super)
+    {
         $result = array();
         $cmd = $this->pdo->prepare("SELECT id, ordem FROM adms_niveis_acessos WHERE ordem=:ordem_super LIMIT 1");
         $cmd->bindValue(":ordem_super", $ordem_super, PDO::PARAM_INT);
@@ -314,7 +318,8 @@ class Conexao
         return $result;
     }
 
-    public function altualizaOrdemNivelAcessoMaior($ordem, $niv_super){
+    public function altualizaOrdemNivelAcessoMaior($ordem, $niv_super)
+    {
         $cmd = $this->pdo->prepare("UPDATE adms_niveis_acessos SET ordem=:ordem, modified=NOW() 
         WHERE id=:niv_super");
         $cmd->bindValue(":ordem", $ordem, PDO::PARAM_INT);
@@ -323,8 +328,9 @@ class Conexao
         return true;
     }
 
-    
-    public function altualizaOrdemNivelAcessoMenor($ordem_super, $ordem_niv_atual){
+
+    public function altualizaOrdemNivelAcessoMenor($ordem_super, $ordem_niv_atual)
+    {
         $cmd = $this->pdo->prepare("UPDATE adms_niveis_acessos SET ordem=:ordem_super, modified=NOW() 
         WHERE id=:ordem_niv_atual");
         $cmd->bindValue(":ordem_super", $ordem_super, PDO::PARAM_INT);
@@ -359,18 +365,19 @@ class Conexao
     }
 
     //listar opçoes buscadores no cadatro de pagina "Indexar"
-    public function listarRobots(){
+    public function listarRobots()
+    {
 
         $result = array();
         $cmd = $this->pdo->query("SELECT id, nome FROM adms_robots ");
         $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
         return $result;
-
     }
 
-    
+
     //listar opçoes dependentes no cadatro de pagina "Dependentes"
-    public function listarDependentes(){
+    public function listarDependentes()
+    {
         $result = array();
         $cmd = $this->pdo->query("SELECT id, nome_pagina FROM adms_paginas ORDER BY nome_pagina ASC");
         $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
@@ -378,7 +385,8 @@ class Conexao
     }
 
     //listar opçoes grupos no cadatro de pagina "Grupo"
-    public function listarGrupos(){
+    public function listarGrupos()
+    {
         $result = array();
         $cmd = $this->pdo->query("SELECT id, nome FROM adms_grps_pgs ORDER BY nome ASC");
         $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
@@ -386,7 +394,8 @@ class Conexao
     }
 
     //listar opçoes tipos de paginas no cadatro de pagina "Tipos"
-    public function listarTiposPaginas(){
+    public function listarTiposPaginas()
+    {
         $result = array();
         $cmd = $this->pdo->query("SELECT id, tipo, nome FROM  adms_tps_pg ORDER BY nome ASC");
         $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
@@ -394,19 +403,31 @@ class Conexao
     }
 
     //listar opçoes tipos de paginas no cadatro de pagina "Tipos"
-    public function listarSituacaoPaginas(){
+    public function listarSituacaoPaginas()
+    {
         $result = array();
         $cmd = $this->pdo->query("SELECT id, nome FROM  adms_sits_pgs ORDER BY nome ASC");
         $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
         return $result;
     }
 
-    public function cadastrarPagina($nome_pagina,$endereco,$obs,$keywords,$descriptio,$author,
-    $lib_pub, $icone, $depend_pg, $adms_grps_pg_id, $adms_tps_pg_id, 
-    $adms_robot_id, $adms_sits_pg_id
-    )
-    
-    {
+    //Cadastrar pagina no banco de dados.
+
+    public function cadastrarPagina(
+        $nome_pagina,
+        $endereco,
+        $obs,
+        $keywords,
+        $descriptio,
+        $author,
+        $lib_pub,
+        $icone,
+        $depend_pg,
+        $adms_grps_pg_id,
+        $adms_tps_pg_id,
+        $adms_robot_id,
+        $adms_sits_pg_id
+    ) {
 
         $cmd = $this->pdo->prepare("INSERT INTO  adms_paginas 
         (nome_pagina, endereco, obs, keywords, descriptio, author, 
@@ -416,26 +437,92 @@ class Conexao
         VALUES (:nome_pagina, :endereco, :obs, :keywords, :descriptio, :author, 
         :lib_pub, :icone, :depend_pg, :adms_grps_pg_id, :adms_tps_pg_id, :adms_robot_id, :adms_sits_pg_id, NOW()) ");
 
-        $cmd->bindValue(":nome_pagina", $nome_pagina);
-        $cmd->bindValue(":endereco", $endereco);
-        $cmd->bindValue(":obs", $obs);
-        $cmd->bindValue(":keywords", $keywords);
-        $cmd->bindValue(":descriptio", $descriptio);
-        $cmd->bindValue(":author", $author);
+        $cmd->bindValue(":nome_pagina", $nome_pagina, PDO::PARAM_STR);
+        $cmd->bindValue(":endereco", $endereco, PDO::PARAM_STR);
+        $cmd->bindValue(":obs", $obs, PDO::PARAM_STR);
+        $cmd->bindValue(":keywords", $keywords, PDO::PARAM_STR);
+        $cmd->bindValue(":descriptio", $descriptio, PDO::PARAM_STR);
+        $cmd->bindValue(":author", $author, PDO::PARAM_STR);
 
-        $cmd->bindValue(":lib_pub", $lib_pub);
-        $cmd->bindValue(":icone", $icone);
-        $cmd->bindValue(":depend_pg", $depend_pg);
-        $cmd->bindValue(":adms_grps_pg_id", $adms_grps_pg_id);
+        $cmd->bindValue(":lib_pub", $lib_pub, PDO::PARAM_INT);
+        $cmd->bindValue(":icone", $icone, PDO::PARAM_STR);
+        $cmd->bindValue(":depend_pg", $depend_pg, PDO::PARAM_INT);
+        $cmd->bindValue(":adms_grps_pg_id", $adms_grps_pg_id, PDO::PARAM_INT);
+        $cmd->bindValue(":adms_tps_pg_id", $adms_tps_pg_id, PDO::PARAM_INT);
+
+        $cmd->bindValue(":adms_robot_id", $adms_robot_id, PDO::PARAM_INT);
+        $cmd->bindValue(":adms_sits_pg_id", $adms_sits_pg_id, PDO::PARAM_INT);
+        $cmd->execute();
+        //apos a execucao da query passei o parametro para pegar o valor do ultimo id cadastrado
+        // e retornei ele mesmo
+        $cmd = $this->pdo->lastInsertId();
+        return $cmd;
+    }
+
+    public function validarCadPaginaDuplicada($endereco, $adms_tps_pg_id)
+    {
+        $result = array();
+        $cmd = $this->pdo->prepare("SELECT id FROM adms_paginas 
+        WHERE endereco=:endereco 
+        AND adms_tps_pg_id=:adms_tps_pg_id");
+        $cmd->bindValue(":endereco", $endereco);
         $cmd->bindValue(":adms_tps_pg_id", $adms_tps_pg_id);
+        $cmd->execute();
+        $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+    }
+
+    public function pesquisarIdNivelAcessoCadastrados(){
+        $result = array();
+        $cmd = $this->pdo->query("SELECT id, nome FROM adms_niveis_acessos");
+        $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+
+    }
+
+    public function maiorNumeroOrdemAdmsNivAcs($result_niv_acesso_id){
+        $result = array();
+        $cmd = $this->pdo->prepare("SELECT ordem FROM adms_nivacs_pgs 
+        WHERE adms_niveis_acesso_id=:adms_niveis_acesso_id
+        ORDER BY ordem DESC LIMIT 1 "); 
+        $cmd->bindValue(":adms_niveis_acesso_id", $result_niv_acesso_id);
+        $cmd->execute();
+        $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+    }
+
+    //CADASTRAR no banco de dados a permissão de acessar a página na tabela adms_nivacs_pgs
+
+    public function cadastrarPermissaoAcesso(
+        $permissao, 
+        $ordem, 
+        $result_niv_acesso_id, 
+        $pagina_id){
+
+        $cmd = $this->pdo->prepare("INSERT INTO adms_nivacs_pgs 
+        (	permissao, 
+            ordem, 
+            dropdown, 
+            lib_menu, 
+            adms_menu_id, 
+            adms_niveis_acesso_id, 
+            adms_pagina_id, 
+            created	) 
+            VALUES (
+                :permissao, 
+                :ordem, 
+                1, 
+                2, 
+                3, 
+                :adms_niveis_acesso_id, 
+                :adms_pagina_id, 
+                NOW())");
         
-        $cmd->bindValue(":adms_robot_id", $adms_robot_id);
-        $cmd->bindValue(":adms_sits_pg_id", $adms_sits_pg_id);
+        $cmd->bindValue(":permissao", $permissao, PDO::PARAM_INT);
+        $cmd->bindValue(":ordem", $ordem, PDO::PARAM_INT);
+        $cmd->bindValue(":adms_niveis_acesso_id", $result_niv_acesso_id, PDO::PARAM_INT);
+        $cmd->bindValue(":adms_pagina_id", $pagina_id, PDO::PARAM_INT);
         $cmd->execute();
         return true;
     }
-    
-
-
-    
 }

@@ -24,7 +24,7 @@ if ($SendCadPg) {
 
     //destruir as posições do array $dados
     unset($dados['obs'], $dados['icone']);
-
+    // var_dump($dados);
 
     //validar se existe algum desses campos obrigatorios vazios (tirando o obs e icone que foram destruidos)
     //inclui o arquivo lib_vazio responsável por validar se existe campo vazio.
@@ -32,7 +32,7 @@ if ($SendCadPg) {
     include_once 'lib/lib_vazio.php';
 
     $dados_validos = vazio($dados);
-//var_dump( $dados_validos);
+    //var_dump( $dados_validos);
 
     if (!$dados_validos) {
         //se for diferente de verdadeiro(no caso falso algum campo esta vazio)
@@ -40,31 +40,90 @@ if ($SendCadPg) {
         //erro se torna verdadeiro e caiu no if abaixo redirecionando para cadastrar.
         $erro = true;
         $_SESSION['msg'] = "<div class='alert alert-danger'> Necessário preencher todos os campos para cadastrar a página!</div>";
+    } else {
+        //Proibir o cadatro de página duplicado
+        $resultado_pagina_duplicada = $pdo->validarCadPaginaDuplicada($dados_validos['endereco'], $dados_validos['adms_tps_pg_id']);
+
+        if ($resultado_pagina_duplicada) {
+            $erro = true;
+            $_SESSION['msg'] = "<div class='alert alert-danger'> Este endereço já esta cadastrado!</div>";
+        }
     }
 
 
     //HOUVE ERRO EM ALGUM CAMPO SERÁ REDIRECIONADO PARA O CADASTRAR PAGINA.
     if ($erro) {
+        $dados['obs'] = trim($dados_ob); //campo observação
+        $dados['icone'] = $dados_icone; //campo icone
+        $_SESSION['dados'] = $dados;
         //se o usuario tentar entrar na pagina sem clicar no botão.
         $url_destino = pg . '/cadastrar/cad_pagina';
         header("Location: $url_destino");
 
         //NÃO HÁ ERRO NO FORMULÁRIO TENTA CADASTRAR NO BANCO
     } else {
-        $result_cad_pagina = $pdo->cadastrarPagina($dados_validos['nome_pagina'], $dados_validos['endereco'], $dados_ob, $dados_validos['keywords'], $dados_validos['description'], 
-        $dados_validos['author'], $dados_validos['lib_pub'], $dados_icone, $dados_validos['depend_pg'],
-        $dados_validos['adms_grps_pg_id'], $dados_validos['adms_tps_pg_id'], $dados_validos['adms_robot_id'],
-        $dados_validos['adms_sits_pg_id'] );
+        $result_cad_pagina = $pdo->cadastrarPagina(
+            $dados_validos['nome_pagina'],
+            $dados_validos['endereco'],
+            $dados_ob,
+            $dados_validos['keywords'],
+            $dados_validos['description'],
+            $dados_validos['author'],
+            $dados_validos['lib_pub'],
+            $dados_icone,
+            $dados_validos['depend_pg'],
+            $dados_validos['adms_grps_pg_id'],
+            $dados_validos['adms_tps_pg_id'],
+            $dados_validos['adms_robot_id'],
+            $dados_validos['adms_sits_pg_id']
+        );
 
 
         if ($result_cad_pagina) {
+            unset($_SESSION['dados']);
+
+            //Inicio inserir na tabela adms_nivacs_pgs
+
+            //neste caso ele vai retornar o id da ultima pagina cadastrada isso pq eu usei o parametro
+            //pdo->lastInsertId(); dentro da funcao que insere os dados e retornei ele mesmo sendo assim apos a chamada da funcao
+            //ea retorna o valor do id da ultima pagina cadastrada.
+            $pagina_id = $result_cad_pagina; 
+
+            //Pesquisar os niveis de acesso
+            $result_niv_acesso = $pdo->pesquisarIdNivelAcessoCadastrados(); 
+            
+
+            for ($i=0; $i < count($result_niv_acesso) ; $i++) { 
+                foreach ($result_niv_acesso[$i] as $value) {
+                    if($value['id'] == 1){
+                        $permissao = 1;
+                    }else {
+                        $permissao = 2;
+                    }
+
+                    
+
+                }
+                
+                //Pesquisar o maior numero da ordem na tabela  adms_nivacs_pgs para o nivel em execução
+                $result_maior_ordem = $pdo->maiorNumeroOrdemAdmsNivAcs($result_niv_acesso[$i]['id']);
+                $ordem = $result_maior_ordem[$i]['ordem'] + 1;
+
+                $result_cad_nivacs_pg = $pdo->cadastrarPermissaoAcesso($permissao, $ordem, $result_niv_acesso[$i]['id'], $pagina_id);
+            
+            }
+            
             $_SESSION['msg'] = "<div class='alert alert-success'> Página cadastrada! </div>";
-    $url_destino = pg . '/listar/list_pagina';
-    header("Location: $url_destino");
-        }else{
+            $url_destino = pg . '/listar/list_pagina';
+            header("Location: $url_destino");
+        } else {
+            $dados['obs'] = trim($dados_ob); //campo observação
+            $dados['icone'] = $dados_icone; //campo icone
+            $_SESSION['dados'] = $dados;
+            
             $_SESSION['msg'] = "<div class='alert alert-danger'> Página não cadastrada! </div>";
-    $url_destino = pg . '/cadastrar/cad_pagina';
-    header("Location: $url_destino");
+            $url_destino = pg . '/cadastrar/cad_pagina';
+            header("Location: $url_destino");
         }
     }
 } else {

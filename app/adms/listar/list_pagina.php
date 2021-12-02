@@ -34,11 +34,13 @@ include_once 'app/adms/include/head.php';
 
                     </div>
                 </div>
+                <pre>
                 <?php
                 //se cadastrar com sucesso impresse essa variavel global
                 if (isset($_SESSION['msg'])) {
                     echo $_SESSION['msg'];
                     unset($_SESSION['msg']);
+
                 }
 
                 //recebe o numero da pagina que o usuario esta
@@ -46,7 +48,7 @@ include_once 'app/adms/include/head.php';
                 $pagina = (!empty($pagina_atual)) ? $pagina_atual : 1;
 
                 //setar a quantidade de itens por pagina
-                $qnt_result_pg = 10;
+                $qnt_result_pg = 50;
 
                 //calcular o inicio visualização
                 $inicio = ($qnt_result_pg * $pagina) - $qnt_result_pg;
@@ -60,6 +62,7 @@ include_once 'app/adms/include/head.php';
 
                 if ($result_paginacaoNivelAcessoPagina) {
                 ?>
+                </pre>
                     <div class="table-responsive">
                         <table class="table table table-bordered table-striped table-hover ">
                             <thead>
