@@ -119,7 +119,7 @@ include_once 'app/adms/include/head.php';
                             <dt class="col-sm-3 text-truncate">Data Cadastro</dt>
                             <dd class="col-sm-9"><?php echo date('d/m/y H:i:s', strtotime($result_niv_aces[$i]['created'])) ?></dd>
 
-                            <dt class="col-sm-3 text-truncate">Data Modificacao</dt>
+                            <dt class="col-sm-3 text-truncate">Data de Edição</dt>
                             <dd class="col-sm-9"><?php
                                                     //verifica se a variavel data existe.
                                                     //usuei o date e formatei para ficar mais amigavel

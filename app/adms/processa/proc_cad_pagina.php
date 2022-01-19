@@ -94,20 +94,18 @@ if ($SendCadPg) {
             
 
             for ($i=0; $i < count($result_niv_acesso) ; $i++) { 
-                foreach ($result_niv_acesso[$i] as $value) {
-                    if($value['id'] == 1){
-                        $permissao = 1;
-                    }else {
-                        $permissao = 2;
-                    }
-
-                    
-
+                //Determinar 1 na permissão caso seja superadministrador e para outros niveis 2:  1 Liberado, 2 - BLoqueado
+                if ($result_niv_acesso[$i]['id'] == 1) {
+                    $permissao = 1;
+                }else{
+                    $permissao = 2;
                 }
                 
-                //Pesquisar o maior numero da ordem na tabela  adms_nivacs_pgs para o nivel em execução
-                $result_maior_ordem = $pdo->maiorNumeroOrdemAdmsNivAcs($result_niv_acesso[$i]['id']);
-                $ordem = $result_maior_ordem[$i]['ordem'] + 1;
+                //Pesquisar o maior numero da ordem na tabela  adms_nivacs_pgs (para o nivel de acesso em eecução, é realmente necessario verificar se o nivel de acesso é igual o nive do usuario em execucao?)
+                $result_maior_ordem = $pdo->maiorNumeroOrdemAdmsNivAcs();
+                $ordem = $result_maior_ordem[0]['ordem'] + 1;
+                
+                
 
                 $result_cad_nivacs_pg = $pdo->cadastrarPermissaoAcesso($permissao, $ordem, $result_niv_acesso[$i]['id'], $pagina_id);
             

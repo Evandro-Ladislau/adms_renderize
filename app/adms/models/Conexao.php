@@ -480,12 +480,10 @@ class Conexao
 
     }
 
-    public function maiorNumeroOrdemAdmsNivAcs($result_niv_acesso_id){
+    public function maiorNumeroOrdemAdmsNivAcs(){
         $result = array();
         $cmd = $this->pdo->prepare("SELECT ordem FROM adms_nivacs_pgs 
-        WHERE adms_niveis_acesso_id=:adms_niveis_acesso_id
-        ORDER BY ordem DESC LIMIT 1 "); 
-        $cmd->bindValue(":adms_niveis_acesso_id", $result_niv_acesso_id);
+        ORDER BY ordem DESC LIMIT 1 ");
         $cmd->execute();
         $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
         return $result;
@@ -524,5 +522,15 @@ class Conexao
         $cmd->bindValue(":adms_pagina_id", $pagina_id, PDO::PARAM_INT);
         $cmd->execute();
         return true;
+    }
+
+
+    public function pesquisarPaginasCadastradas($id){
+        $result = array();
+        $cmd = $this->pdo->prepare("SELECT * FROM adms_paginas WHERE id=:id");
+        $cmd->bindValue(":id", $id, PDO::PARAM_INT);
+        $cmd->execute();
+        $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
     }
 }
