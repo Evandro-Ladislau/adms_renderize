@@ -115,13 +115,40 @@ if (!empty($id)) {
                             <dd class="col-sm-9"><?php echo $resultado_paginasCadastradas[$i]['author']; ?></dd>
 
                             <dt class="col-sm-3">Pública</dt>
-                            <dd class="col-sm-9"><?php echo $resultado_paginasCadastradas[$i]['lib_pub']; ?></dd>
+                            <dd class="col-sm-9">
+                                <?php 
+                                if( $resultado_paginasCadastradas[$i]['lib_pub'] == 1){
+                                    echo "<span class='badge bg-success'>Sim</span>";
+                                }else{
+                                    echo "<span class='badge bg-danger'>Não</span>"; 
+                                }
+                                
+                                ?>
+                            </dd>
 
                             <dt class="col-sm-3">Ícone</dt>
-                            <dd class="col-sm-9"><?php echo $resultado_paginasCadastradas[$i]['icone']; ?></dd>
+                            <dd class="col-sm-9">
+                                <?php
+                                if(!empty($resultado_paginasCadastradas[$i]['icone'])){
+
+                                echo "<i class='".$resultado_paginasCadastradas[$i]['icone']."'></i> : " . $resultado_paginasCadastradas[$i]['icone'];
+
+                                }else{
+                                    echo "VAZIO";
+                                }
+                                 ?>
+                            </dd>
 
                             <dt class="col-sm-3">Dependente</dt>
-                            <dd class="col-sm-9"><?php echo $resultado_paginasCadastradas[$i]['depend_pg']; ?></dd>
+                            <dd class="col-sm-9"><?php 
+                            if(!empty($resultado_paginasCadastradas[$i]['nome_depg'])){
+                                echo "<a href='".pg."/visualizar/vis_pagina?id=".$resultado_paginasCadastradas[$i]['id_depg']."'>".$resultado_paginasCadastradas[$i]['nome_depg']."</a>";
+                            }else{
+                                echo "<span class='badge bg-danger'>Não</span>"; 
+                            }
+                            
+                           ?>
+                            </dd>
 
                             <dt class="col-sm-3">Grupo Página</dt>
                             <dd class="col-sm-9"><?php echo $resultado_paginasCadastradas[$i]['adms_grps_pg_id']; ?></dd>

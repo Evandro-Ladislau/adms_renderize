@@ -527,7 +527,11 @@ class Conexao
 
     public function pesquisarPaginasCadastradas($id){
         $result = array();
-        $cmd = $this->pdo->prepare("SELECT * FROM adms_paginas WHERE id=:id");
+        $cmd = $this->pdo->prepare("SELECT pg.*, 
+        depg.id id_depg, depg.nome_pagina nome_depg
+        FROM adms_paginas pg
+        LEFT JOIN adms_paginas depg ON depg.id=pg.depend_pg
+        WHERE pg.id=:id");
         $cmd->bindValue(":id", $id, PDO::PARAM_INT);
         $cmd->execute();
         $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
