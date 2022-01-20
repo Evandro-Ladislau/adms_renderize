@@ -528,8 +528,16 @@ class Conexao
     public function pesquisarPaginasCadastradas($id){
         $result = array();
         $cmd = $this->pdo->prepare("SELECT pg.*, 
+        grpg.nome nome_grpg,
+        tppg.tipo tipo_tppg ,tppg.nome nome_tppg,
+        rb.tipo tipo_rb, rb.nome nome_rb,
+        sitpg.nome nome_sitpg, sitpg.cor,
         depg.id id_depg, depg.nome_pagina nome_depg
         FROM adms_paginas pg
+        LEFT JOIN adms_grps_pgs grpg ON grpg.id=pg.adms_grps_pg_id
+        LEFT JOIN adms_tps_pg tppg ON tppg.id=pg.adms_tps_pg_id
+        LEFT JOIN adms_robots rb ON rb.id=pg.adms_robot_id
+        INNER JOIN adms_sits_pgs sitpg ON sitpg.id=pg.adms_sits_pg_id
         LEFT JOIN adms_paginas depg ON depg.id=pg.depend_pg
         WHERE pg.id=:id");
         $cmd->bindValue(":id", $id, PDO::PARAM_INT);

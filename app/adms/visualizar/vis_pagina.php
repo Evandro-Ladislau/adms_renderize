@@ -151,16 +151,20 @@ if (!empty($id)) {
                             </dd>
 
                             <dt class="col-sm-3">Grupo Página</dt>
-                            <dd class="col-sm-9"><?php echo $resultado_paginasCadastradas[$i]['adms_grps_pg_id']; ?></dd>
+                            <dd class="col-sm-9"><?php echo $resultado_paginasCadastradas[$i]['nome_grpg']; ?></dd>
 
                             <dt class="col-sm-3">Tipo da Página</dt>
-                            <dd class="col-sm-9"><?php echo $resultado_paginasCadastradas[$i]['adms_tps_pg_id']; ?></dd>
+                            <dd class="col-sm-9"><?php echo $resultado_paginasCadastradas[$i]['tipo_tppg']."-".$resultado_paginasCadastradas[$i]['nome_tppg']; ?></dd>
 
                             <dt class="col-sm-3">Indexar</dt>
-                            <dd class="col-sm-9"><?php echo $resultado_paginasCadastradas[$i]['adms_robot_id']; ?></dd>
+                            <dd class="col-sm-9"><?php echo $resultado_paginasCadastradas[$i]['tipo_rb']."-".$resultado_paginasCadastradas[$i]['nome_rb']; ?></dd>
 
                             <dt class="col-sm-3">Situação</dt>
-                            <dd class="col-sm-9"><?php echo $resultado_paginasCadastradas[$i]['adms_sits_pg_id']; ?></dd>
+                            <dd class="col-sm-9">
+                            <?php 
+                                echo "<span class='badge bg-".$resultado_paginasCadastradas[$i]['cor']."'> ".$resultado_paginasCadastradas[$i]['nome_sitpg']."</span>"; 
+                            ?>
+                            </dd>
 
                             <dt class="col-sm-3 text-truncate">Data Cadastro</dt>
                             <dd class="col-sm-9"><?php echo date('d/m/y H:i:s', strtotime($resultado_paginasCadastradas[$i]['created'])) ?></dd>
