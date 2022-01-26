@@ -459,14 +459,15 @@ class Conexao
         return $cmd;
     }
 
-    public function validarCadPaginaDuplicada($endereco, $adms_tps_pg_id)
+    public function validarCadPaginaDuplicada($endereco, $adms_tps_pg_id, $id)
     {
         $result = array();
         $cmd = $this->pdo->prepare("SELECT id FROM adms_paginas 
         WHERE endereco=:endereco 
-        AND adms_tps_pg_id=:adms_tps_pg_id");
+        AND adms_tps_pg_id=:adms_tps_pg_id AND id <>:id");
         $cmd->bindValue(":endereco", $endereco);
         $cmd->bindValue(":adms_tps_pg_id", $adms_tps_pg_id);
+        $cmd->bindValue(":id", $id, PDO::PARAM_INT);
         $cmd->execute();
         $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
         return $result;
@@ -539,10 +540,56 @@ class Conexao
         LEFT JOIN adms_robots rb ON rb.id=pg.adms_robot_id
         INNER JOIN adms_sits_pgs sitpg ON sitpg.id=pg.adms_sits_pg_id
         LEFT JOIN adms_paginas depg ON depg.id=pg.depend_pg
-        WHERE pg.id=:id");
+        WHERE pg.id=:id LIMIT 1");
         $cmd->bindValue(":id", $id, PDO::PARAM_INT);
         $cmd->execute();
         $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
         return $result;
+    }
+
+    public function VerificarPaginasCadastradasNoBanco($id){
+        $result = array();
+        $cmd = $this->pdo->prepare("SELECT * FROM adms_paginas WHERE id=:id LIMIT 1");
+        $cmd->bindValue(":id", $id, PDO::PARAM_INT);
+        $cmd->execute();
+        $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+    }
+
+    public function EditarPagina($nome_pagina, $endereco, $obs, $keywords, $descriptio, $author, 
+    $lib_pub, $icone, $depend_pg, $adms_grps_pg_id, $adms_tps_pg_id, $adms_robot_id, $adms_sits_pg_id, $id)
+    {
+        $cmd = $this->pdo->prepare("UPDATE adms_paginas SET nome_pagina=:nome_pagina,
+        endereco=:endereco,
+        obs=:obs,
+        keywords=:keywords,
+        descriptio=:descriptio,
+        author=:author,
+        lib_pub=:lib_pub,
+        icone=:icone,
+        depend_pg=:depend_pg,
+        adms_grps_pg_id=:adms_grps_pg_id,
+        adms_tps_pg_id=:adms_tps_pg_id,
+        adms_robot_id=:adms_robot_id,
+        adms_sits_pg_id=:adms_sits_pg_id,
+        modified=NOW() WHERE id=:id");
+
+         $cmd->bindValue(":nome_pagina", $nome_pagina, PDO::PARAM_STR);
+         $cmd->bindValue(":endereco", $endereco, PDO::PARAM_STR);
+         $cmd->bindValue(":obs", $obs, PDO::PARAM_STR);
+         $cmd->bindValue(":keywords", $keywords, PDO::PARAM_STR);
+         $cmd->bindValue(":descriptio", $descriptio, PDO::PARAM_STR);
+         $cmd->bindValue(":author", $author, PDO::PARAM_STR);
+         $cmd->bindValue(":lib_pub", $lib_pub, PDO::PARAM_INT);
+         $cmd->bindValue(":icone", $icone, PDO::PARAM_STR);
+         $cmd->bindValue(":depend_pg", $depend_pg, PDO::PARAM_INT);
+         $cmd->bindValue(":adms_grps_pg_id", $adms_grps_pg_id, PDO::PARAM_INT);
+         $cmd->bindValue(":adms_tps_pg_id", $adms_tps_pg_id, PDO::PARAM_INT);
+         $cmd->bindValue(":adms_robot_id", $adms_robot_id, PDO::PARAM_INT);
+         $cmd->bindValue(":adms_sits_pg_id", $adms_sits_pg_id, PDO::PARAM_INT);
+         $cmd->bindValue(":id", $id, PDO::PARAM_INT);
+         $cmd->execute();
+         return true;
+
     }
 }
