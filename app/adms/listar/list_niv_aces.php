@@ -100,6 +100,13 @@ include_once 'app/adms/include/head.php';
                                                     }
                                                 }
                                                 $qnt_linhas_exe++;
+
+                                                $btn_list_permissao = $pdo->carregarBtn('listar/list_permissao');
+
+                                                if ($btn_list_permissao) {
+                                                    echo " <a href='" . pg . "/listar/list_permissao?id=".$result_paginacaoNivelAcesso[$i]['id']."' class='btn btn-outline-info btn-sm'> Permissão </a>";
+                                                }
+
                                                 //BOTAO VISUALIZAE
                                                 $btn_vis = $pdo->carregarBtn('visualizar/vis_niv_aces');
 

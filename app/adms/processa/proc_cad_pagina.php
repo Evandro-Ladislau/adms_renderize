@@ -42,7 +42,7 @@ if ($SendCadPg) {
         $_SESSION['msg'] = "<div class='alert alert-danger'> Necessário preencher todos os campos para cadastrar a página!</div>";
     } else {
         //Proibir o cadatro de página duplicado
-        $resultado_pagina_duplicada = $pdo->validarCadPaginaDuplicada($dados_validos['endereco'], $dados_validos['adms_tps_pg_id']);
+        $resultado_pagina_duplicada = $pdo->validarCadPaginaDuplicada($dados_validos['endereco'], $dados_validos['adms_tps_pg_id'], $id);
 
         if ($resultado_pagina_duplicada) {
             $erro = true;

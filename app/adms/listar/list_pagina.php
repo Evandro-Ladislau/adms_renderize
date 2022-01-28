@@ -47,7 +47,7 @@ include_once 'app/adms/include/head.php';
                 $pagina = (!empty($pagina_atual)) ? $pagina_atual : 1;
 
                 //setar a quantidade de itens por pagina
-                $qnt_result_pg = 50;
+                $qnt_result_pg = 5;
 
                 //calcular o inicio visualização
                 $inicio = ($qnt_result_pg * $pagina) - $qnt_result_pg;
@@ -56,7 +56,7 @@ include_once 'app/adms/include/head.php';
                     //chamei a funcao que busca a paginacao conforme nivel de acesso.
                     $result_paginacaoNivelAcessoPagina = $pdo->paginacaoNivelAcessoPaginas($inicio, $qnt_result_pg);
                 } else {
-                    //$result_paginacaoNivelAcesso = $pdo->paginacaoNivelAcessoLimitado($inicio, $qnt_result_pg);
+                    $result_paginacaoNivelAcessoPagina = $pdo->paginacaoNivelAcessoLimitado($inicio, $qnt_result_pg);
                 }
 
                 if ($result_paginacaoNivelAcessoPagina) {

@@ -464,7 +464,7 @@ class Conexao
         $result = array();
         $cmd = $this->pdo->prepare("SELECT id FROM adms_paginas 
         WHERE endereco=:endereco 
-        AND adms_tps_pg_id=:adms_tps_pg_id AND id <>:id");
+        AND adms_tps_pg_id=:adms_tps_pg_id AND id <> :id");
         $cmd->bindValue(":endereco", $endereco);
         $cmd->bindValue(":adms_tps_pg_id", $adms_tps_pg_id);
         $cmd->bindValue(":id", $id, PDO::PARAM_INT);
@@ -473,15 +473,16 @@ class Conexao
         return $result;
     }
 
-    public function pesquisarIdNivelAcessoCadastrados(){
+    public function pesquisarIdNivelAcessoCadastrados()
+    {
         $result = array();
         $cmd = $this->pdo->query("SELECT id, nome FROM adms_niveis_acessos");
         $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
         return $result;
-
     }
 
-    public function maiorNumeroOrdemAdmsNivAcs(){
+    public function maiorNumeroOrdemAdmsNivAcs()
+    {
         $result = array();
         $cmd = $this->pdo->prepare("SELECT ordem FROM adms_nivacs_pgs 
         ORDER BY ordem DESC LIMIT 1 ");
@@ -493,10 +494,11 @@ class Conexao
     //CADASTRAR no banco de dados a permissão de acessar a página na tabela adms_nivacs_pgs
 
     public function cadastrarPermissaoAcesso(
-        $permissao, 
-        $ordem, 
-        $result_niv_acesso_id, 
-        $pagina_id){
+        $permissao,
+        $ordem,
+        $result_niv_acesso_id,
+        $pagina_id
+    ) {
 
         $cmd = $this->pdo->prepare("INSERT INTO adms_nivacs_pgs 
         (	permissao, 
@@ -516,7 +518,7 @@ class Conexao
                 :adms_niveis_acesso_id, 
                 :adms_pagina_id, 
                 NOW())");
-        
+
         $cmd->bindValue(":permissao", $permissao, PDO::PARAM_INT);
         $cmd->bindValue(":ordem", $ordem, PDO::PARAM_INT);
         $cmd->bindValue(":adms_niveis_acesso_id", $result_niv_acesso_id, PDO::PARAM_INT);
@@ -526,7 +528,8 @@ class Conexao
     }
 
 
-    public function pesquisarPaginasCadastradas($id){
+    public function pesquisarPaginasCadastradas($id)
+    {
         $result = array();
         $cmd = $this->pdo->prepare("SELECT pg.*, 
         grpg.nome nome_grpg,
@@ -547,7 +550,8 @@ class Conexao
         return $result;
     }
 
-    public function VerificarPaginasCadastradasNoBanco($id){
+    public function VerificarPaginasCadastradasNoBanco($id)
+    {
         $result = array();
         $cmd = $this->pdo->prepare("SELECT * FROM adms_paginas WHERE id=:id LIMIT 1");
         $cmd->bindValue(":id", $id, PDO::PARAM_INT);
@@ -556,9 +560,22 @@ class Conexao
         return $result;
     }
 
-    public function EditarPagina($nome_pagina, $endereco, $obs, $keywords, $descriptio, $author, 
-    $lib_pub, $icone, $depend_pg, $adms_grps_pg_id, $adms_tps_pg_id, $adms_robot_id, $adms_sits_pg_id, $id)
-    {
+    public function EditarPagina(
+        $nome_pagina,
+        $endereco,
+        $obs,
+        $keywords,
+        $descriptio,
+        $author,
+        $lib_pub,
+        $icone,
+        $depend_pg,
+        $adms_grps_pg_id,
+        $adms_tps_pg_id,
+        $adms_robot_id,
+        $adms_sits_pg_id,
+        $id
+    ) {
         $cmd = $this->pdo->prepare("UPDATE adms_paginas SET nome_pagina=:nome_pagina,
         endereco=:endereco,
         obs=:obs,
@@ -574,22 +591,74 @@ class Conexao
         adms_sits_pg_id=:adms_sits_pg_id,
         modified=NOW() WHERE id=:id");
 
-         $cmd->bindValue(":nome_pagina", $nome_pagina, PDO::PARAM_STR);
-         $cmd->bindValue(":endereco", $endereco, PDO::PARAM_STR);
-         $cmd->bindValue(":obs", $obs, PDO::PARAM_STR);
-         $cmd->bindValue(":keywords", $keywords, PDO::PARAM_STR);
-         $cmd->bindValue(":descriptio", $descriptio, PDO::PARAM_STR);
-         $cmd->bindValue(":author", $author, PDO::PARAM_STR);
-         $cmd->bindValue(":lib_pub", $lib_pub, PDO::PARAM_INT);
-         $cmd->bindValue(":icone", $icone, PDO::PARAM_STR);
-         $cmd->bindValue(":depend_pg", $depend_pg, PDO::PARAM_INT);
-         $cmd->bindValue(":adms_grps_pg_id", $adms_grps_pg_id, PDO::PARAM_INT);
-         $cmd->bindValue(":adms_tps_pg_id", $adms_tps_pg_id, PDO::PARAM_INT);
-         $cmd->bindValue(":adms_robot_id", $adms_robot_id, PDO::PARAM_INT);
-         $cmd->bindValue(":adms_sits_pg_id", $adms_sits_pg_id, PDO::PARAM_INT);
-         $cmd->bindValue(":id", $id, PDO::PARAM_INT);
-         $cmd->execute();
-         return true;
+        $cmd->bindValue(":nome_pagina", $nome_pagina, PDO::PARAM_STR);
+        $cmd->bindValue(":endereco", $endereco, PDO::PARAM_STR);
+        $cmd->bindValue(":obs", $obs, PDO::PARAM_STR);
+        $cmd->bindValue(":keywords", $keywords, PDO::PARAM_STR);
+        $cmd->bindValue(":descriptio", $descriptio, PDO::PARAM_STR);
+        $cmd->bindValue(":author", $author, PDO::PARAM_STR);
+        $cmd->bindValue(":lib_pub", $lib_pub, PDO::PARAM_INT);
+        $cmd->bindValue(":icone", $icone, PDO::PARAM_STR);
+        $cmd->bindValue(":depend_pg", $depend_pg, PDO::PARAM_INT);
+        $cmd->bindValue(":adms_grps_pg_id", $adms_grps_pg_id, PDO::PARAM_INT);
+        $cmd->bindValue(":adms_tps_pg_id", $adms_tps_pg_id, PDO::PARAM_INT);
+        $cmd->bindValue(":adms_robot_id", $adms_robot_id, PDO::PARAM_INT);
+        $cmd->bindValue(":adms_sits_pg_id", $adms_sits_pg_id, PDO::PARAM_INT);
+        $cmd->bindValue(":id", $id, PDO::PARAM_INT);
+        $cmd->execute();
+        return true;
+    }
 
+    public function apagarPagina($id)
+    {
+
+        $cmd = $this->pdo->prepare("DELETE FROM adms_paginas WHERE id=:id ");
+        $cmd->bindValue(":id", $id, PDO::PARAM_INT);
+        $cmd->execute();
+        return true;
+    }
+
+    //apaga o nível de acesso da página que for apagada.
+
+    public function apagarNivAcessoPagina($id){
+        $cmd = $this->pdo->prepare("DELETE FROM adms_nivacs_pgs WHERE adms_pagina_id=:id");
+        $cmd->bindValue(":id", $id, PDO::PARAM_INT);
+        $cmd->execute();
+        return true;
+    }
+
+    public function permissaoSuperAdministrador($id, $inicio, $qnt_result_pg){
+        $result = array();
+        $cmd = $this->pdo->prepare("SELECT nivpg.* ,
+        pg.nome_pagina, pg.obs
+        FROM adms_nivacs_pgs nivpg
+        INNER JOIN adms_paginas pg ON pg.id=nivpg.adms_pagina_id
+        WHERE nivpg.adms_niveis_acesso_id=:id 
+        ORDER BY nivpg.ordem ASC 
+        LIMIT :inicio, :qnt_result_pg");
+        $cmd->bindValue(":id", $id, PDO::PARAM_INT);
+        $cmd->bindValue(":inicio", $inicio, PDO::PARAM_INT);
+        $cmd->bindValue(":qnt_result_pg", $qnt_result_pg, PDO::PARAM_INT);
+        $cmd->execute();
+        $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+    }
+
+    public function nomeNivelAcesso($id){
+        $result = array();
+        $cmd = $this->pdo->prepare("SELECT nome FROM adms_niveis_acessos  WHERE id=:id LIMIT 1");
+        $cmd->bindValue(":id", $id, PDO::PARAM_INT);
+        $cmd->execute();
+        $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+    }
+
+
+    public function paginacaoPermissao($id)
+    {
+        $result = array();
+        $cmd = $this->pdo->query("SELECT COUNT(id) AS num_result FROM adms_nivacs_pgs WHERE adms_niveis_acesso_id=$id");
+        $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
     }
 }
