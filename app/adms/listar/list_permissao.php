@@ -17,7 +17,7 @@ if (!empty($id)) {
     $pagina = (!empty($pagina_atual) ? $pagina_atual : 1);
 
     //setar a quantidade de resultado por página
-    $qnt_result_pg = 5;
+    $qnt_result_pg = 50;
 
     //Calcular o inicio da visualização
 
@@ -26,6 +26,7 @@ if (!empty($id)) {
     if ($_SESSION['adms_niveis_acesso_id'] == 1) {
         $result_niv_ac = $pdo->permissaoSuperAdministrador($id, $inicio, $qnt_result_pg);
     } else {
+        $result_niv_ac = $pdo->permissaoSuperAdministrador($id, $inicio, $qnt_result_pg);
     }
 
     //verificar se ele encontrar algum cadastro.
@@ -107,7 +108,32 @@ if (!empty($id)) {
                                                 </span>
                                                 <?php echo $result_niv_ac[$i]['nome_pagina'] ?>
                                             </td>
-                                            <td class="d-none d-sm-table-cell"><?php echo $result_niv_ac[$i]['permissao'] ?></td>
+                                            <td class="d-none d-sm-table-cell">
+                                                <?php
+                                                $btn_lib_permissao = $pdo->carregarBtn('processa/proc_lib_permissao');
+
+                                                if ($btn_lib_permissao) {
+                                                    
+                                                    if ($result_niv_ac[$i]['permissao'] == 1) {
+                                                        $result_pag_permissao = $pdo->buscarPaginaAlterarPermissao();
+                                                        echo "<a href='".pg."/processa/proc_lib_permissao?id=".$result_niv_ac[$i]['id']."'><span class='badge badge-pill badge-success'>Liberado</span></a>";
+                                                    }else{
+                                                        echo "<a href='".pg."/processa/proc_lib_permissao?id=".$result_niv_ac[$i]['id']."'><span class='badge badge-pill badge-danger'>Bloqueado</span></a>";
+                                                    }
+
+                                                }else{
+
+                                                    if ($result_niv_ac[$i]['permissao'] == 1) {
+                                                        echo "<span class='badge badge-pill badge-success'>Liberado</span>";
+                                                    }else{
+                                                        echo "<span class='badge badge-pill badge-danger'>Bloqueado</span>";
+                                                    }
+
+                                                }
+                                                
+
+                                                ?>
+                                            </td>
                                             <td class="d-none d-sm-table-cell"><?php echo $result_niv_ac[$i]['lib_menu'] ?></td>
                                             <td class="d-none d-sm-table-cell"><?php echo $result_niv_ac[$i]['dropdown'] ?></td>
                                             <td class="d-none d-sm-table-cell"><?php echo $result_niv_ac[$i]['ordem'] ?></td>

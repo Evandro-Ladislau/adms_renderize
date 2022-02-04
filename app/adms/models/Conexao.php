@@ -633,7 +633,7 @@ class Conexao
         pg.nome_pagina, pg.obs
         FROM adms_nivacs_pgs nivpg
         INNER JOIN adms_paginas pg ON pg.id=nivpg.adms_pagina_id
-        WHERE nivpg.adms_niveis_acesso_id=:id 
+        WHERE nivpg.adms_niveis_acesso_id=:id AND pg.depend_pg=0
         ORDER BY nivpg.ordem ASC 
         LIMIT :inicio, :qnt_result_pg");
         $cmd->bindValue(":id", $id, PDO::PARAM_INT);
@@ -660,5 +660,59 @@ class Conexao
         $cmd = $this->pdo->query("SELECT COUNT(id) AS num_result FROM adms_nivacs_pgs WHERE adms_niveis_acesso_id=$id");
         $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
         return $result;
+    }
+
+    public function buscarPaginaAlterarPermissao(){
+        $result = array();
+        $cmd = $this->pdo->query("SELECT * FROM adms_paginas");
+        $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+        
+    }
+
+    public function BuscarNiveisAcessoPaginas($id, $ordem){
+        $result = array();
+        $cmd = $this->pdo->prepare("SELECT nivacpg.permissao, nivacpg.adms_niveis_acesso_id, nivacpg.adms_pagina_id
+        FROM adms_nivacs_pgs nivacpg
+        INNER JOIN adms_niveis_acessos nivac ON nivac.id=nivacpg.adms_niveis_acesso_id
+        WHERE nivacpg.id=:id AND nivac.ordem > :ordem LIMIT 1");
+        $cmd->bindValue(":id", $id, PDO::PARAM_INT);
+        $cmd->bindValue(":ordem", $ordem, PDO::PARAM_INT);
+        $cmd->execute();
+        $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+
+    }
+
+    public function AtualizarNivelAcesso($status, $id){
+        $cmd = $this->pdo->prepare("UPDATE adms_nivacs_pgs SET permissao=:estatus, modified=NOW()
+        WHERE id=:id");
+        $cmd->bindValue(":estatus", $status, PDO::PARAM_INT);
+        $cmd->bindValue(":id", $id, PDO::PARAM_INT);
+        $cmd->execute();
+        return true;
+    }
+
+    public function PesquisarPaginasDependentes($adms_pagina_id, $adms_niveis_acesso_id){
+        $result = array();
+        $cmd = $this->pdo->prepare("SELECT nivacpg.id
+        FROM adms_paginas pg
+        LEFT JOIN adms_nivacs_pgs nivacpg ON nivacpg.adms_pagina_id=pg.id
+        WHERE pg.depend_pg=:adms_pagina_id AND nivacpg.adms_niveis_acesso_id=:adms_niveis_acesso_id");
+        $cmd->bindValue(":adms_pagina_id", $adms_pagina_id, PDO::PARAM_INT);
+        $cmd->bindValue(":adms_niveis_acesso_id", $adms_niveis_acesso_id, PDO::PARAM_INT);
+        $cmd->execute();
+        $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+
+    }
+
+    public function AtualizarNivelAcessoDependente($status, $id){
+        $cmd = $this->pdo->prepare("UPDATE adms_nivacs_pgs SET permissao=:estatus, modified=NOW()
+        WHERE id=:id");
+        $cmd->bindValue(":estatus", $status, PDO::PARAM_INT);
+        $cmd->bindValue("id", $id, PDO::PARAM_INT);
+        $cmd->execute();
+        return true;
     }
 }
