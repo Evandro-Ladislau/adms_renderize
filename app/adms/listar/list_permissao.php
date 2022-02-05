@@ -88,10 +88,10 @@ if (!empty($id)) {
                                     <tr>
                                         <th>ID</th>
                                         <th>Página</th>
-                                        <th class="d-none d-sm-table-cell">Permissão</th>
-                                        <th class="d-none d-sm-table-cell">Menu</th>
-                                        <th class="d-none d-sm-table-cell">Dropdown</th>
-                                        <th class="d-none d-sm-table-cell">Ordem</th>
+                                        <th class="d-none d-sm-table-cell text-center">Permissão</th>
+                                        <th class="d-none d-sm-table-cell text-center">Menu</th>
+                                        <th class="d-none d-sm-table-cell text-center">Dropdown</th>
+                                        <th class="d-none d-sm-table-cell text-center">Ordem</th>
                                         <th class="text-center">Ações</th>
                                     </tr>
                                 </thead>
@@ -108,7 +108,7 @@ if (!empty($id)) {
                                                 </span>
                                                 <?php echo $result_niv_ac[$i]['nome_pagina'] ?>
                                             </td>
-                                            <td class="d-none d-sm-table-cell">
+                                            <td class="d-none d-sm-table-cell text-center">
                                                 <?php
                                                 $btn_lib_permissao = $pdo->carregarBtn('processa/proc_lib_permissao');
 
@@ -134,8 +134,58 @@ if (!empty($id)) {
 
                                                 ?>
                                             </td>
-                                            <td class="d-none d-sm-table-cell"><?php echo $result_niv_ac[$i]['lib_menu'] ?></td>
-                                            <td class="d-none d-sm-table-cell"><?php echo $result_niv_ac[$i]['dropdown'] ?></td>
+                                            <td class="d-none d-sm-table-cell text-center">
+                                            <?php
+                                                $btn_lib_menu = $pdo->carregarBtn('processa/proc_lib_menu');
+
+                                                if ($btn_lib_menu) {
+                                                    
+                                                    if ($result_niv_ac[$i]['lib_menu'] == 1) {
+                                                       $result_pag_permissao = $pdo->buscarPaginaAlterarPermissao();
+                                                        echo "<a href='".pg."/processa/proc_lib_menu?id=".$result_niv_ac[$i]['id']."'><span class='badge badge-pill badge-success'>Liberado</span></a>";
+                                                    }else{
+                                                        echo "<a href='".pg."/processa/proc_lib_menu?id=".$result_niv_ac[$i]['id']."'><span class='badge badge-pill badge-danger'>Bloqueado</span></a>";
+                                                    }
+
+                                                }else{
+
+                                                    if ($result_niv_ac[$i]['lib_menu'] == 1) {
+                                                        echo "<span class='badge badge-pill badge-success'>Liberado</span>";
+                                                    }else{
+                                                        echo "<span class='badge badge-pill badge-danger'>Bloqueado</span>";
+                                                    }
+
+                                                }
+                                                
+
+                                                ?>
+                                            </td>
+                                            <td class="d-none d-sm-table-cell text-center">
+                                            <?php
+                                                $btn_lib_dropdown = $pdo->carregarBtn('processa/proc_lib_dropdown');
+
+                                                if ($btn_lib_dropdown) {
+                                                    
+                                                    if ($result_niv_ac[$i]['dropdown'] == 1) {
+                                                       $result_pag_permissao = $pdo->buscarPaginaAlterarPermissao();
+                                                        echo "<a href='".pg."/processa/proc_lib_dropdown?id=".$result_niv_ac[$i]['id']."'><span class='badge badge-pill badge-success'>Sim</span></a>";
+                                                    }else{
+                                                        echo "<a href='".pg."/processa/proc_lib_dropdown?id=".$result_niv_ac[$i]['id']."'><span class='badge badge-pill badge-danger'>Não</span></a>";
+                                                    }
+
+                                                }else{
+
+                                                    if ($result_niv_ac[$i]['dropdown'] == 1) {
+                                                        echo "<span class='badge badge-pill badge-success'>Sim</span>";
+                                                    }else{
+                                                        echo "<span class='badge badge-pill badge-danger'>Não</span>";
+                                                    }
+
+                                                }
+                                                
+
+                                                ?>
+                                            </td>
                                             <td class="d-none d-sm-table-cell"><?php echo $result_niv_ac[$i]['ordem'] ?></td>
                                             <td>Ações</td>
 

@@ -58,7 +58,7 @@ include_once 'app/adms/include/head.php';
                 $result_paginacaoNivelAcesso = $pdo->paginacaoNivelAcesso($inicio, $qnt_result_pg);
 
                 }else{
-                    $result_paginacaoNivelAcesso = $pdo->paginacaoNivelAcessoLimitado($inicio, $qnt_result_pg);
+                    $result_paginacaoNivelAcesso = $pdo->paginacaoNivelAcessoLimitado($inicio, $qnt_result_pg, $_SESSION['ordem']);
                 }
                 
                 if ($result_paginacaoNivelAcesso) {

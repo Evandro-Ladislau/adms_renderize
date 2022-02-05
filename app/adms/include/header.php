@@ -5,7 +5,7 @@ if (!isset($seguranca)) {
 require_once './app/adms/models/Conexao.php';
 require_once './index.php';
 
-$result_dados_usuarios = $pdo->buscarDadosUsuarios();
+$result_dados_usuarios = $pdo->buscarDadosUsuarios($_SESSION['id']);
 
 
 ?>

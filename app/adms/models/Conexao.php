@@ -82,12 +82,12 @@ class Conexao
     }
 
     //Essa função busca os dados do usuario no banco de dados.
-    public function buscarDadosUsuarios()
+    public function buscarDadosUsuarios($id)
     {
         $result = array();
         $cmd = $this->pdo->prepare("SELECT id, nome, imagem FROM adms_usuarios 
         WHERE id=:id LIMIT 1");
-        $cmd->bindValue(":id", $_SESSION['id'], PDO::PARAM_INT);
+        $cmd->bindValue(":id", $id, PDO::PARAM_INT);
         $cmd->execute();
         $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
         return $result;
@@ -96,7 +96,7 @@ class Conexao
 
     //essa funcao pega todos os valores da tabela adms_nivacs_pgs onde o adms_niveis_cesso_id é igual
     // ao do usuario logado tambem a coluna permissao seja igual a 1 e tambem a lib_menu tem que estar liberada .
-    public function buscarBotoesMenu()
+    public function buscarBotoesMenu( $adms_niveis_acesso_id)
     {
         $result = array();
         $cmd = $this->pdo->prepare("SELECT nivpg.dropdown,
@@ -109,7 +109,7 @@ class Conexao
             AND nivpg.permissao=1
             AND nivpg.lib_menu=1 
             ORDER BY men.ordem, nivpg.ordem ASC");
-        $cmd->bindValue(":adms_niveis_acesso_id", $_SESSION['adms_niveis_acesso_id'], PDO::PARAM_INT);
+        $cmd->bindValue(":adms_niveis_acesso_id", $adms_niveis_acesso_id, PDO::PARAM_INT);
         $cmd->execute();
         $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
         return $result;
@@ -133,16 +133,16 @@ class Conexao
 
     //Essa pega as informacoes da tabela adms_niveis_acesso onde a ordem do usuario logado seja igual ou menos que os outros usuarios
     // e limita o resultado do inicio da pagina que ele esta ao valor final de paginas. LIMITANDO CONFORME NIVEL DE ACESSO
-    public function paginacaoNivelAcessoLimitado($inicio, $qnt_result_pg)
+    public function paginacaoNivelAcessoLimitado($inicio, $qnt_result_pg, $ordem)
     {
         $result = array();
         $cmd = $this->pdo->prepare("SELECT * FROM adms_niveis_acessos 
         WHERE ordem > :ordem 
         ORDER BY ordem 
         ASC LIMIT :inicio, :qnt_result_pg");
-        $cmd->bindValue(":ordem", $_SESSION['ordem'], PDO::PARAM_INT);
         $cmd->bindValue(":inicio", $inicio, PDO::PARAM_INT);
         $cmd->bindParam(":qnt_result_pg", $qnt_result_pg, PDO::PARAM_INT);
+        $cmd->bindValue(":ordem", $ordem, PDO::PARAM_INT);
         $cmd->execute();
         $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
         return $result;
@@ -712,6 +712,48 @@ class Conexao
         WHERE id=:id");
         $cmd->bindValue(":estatus", $status, PDO::PARAM_INT);
         $cmd->bindValue("id", $id, PDO::PARAM_INT);
+        $cmd->execute();
+        return true;
+    }
+
+    public function PesuisaDadosNiveisAcessoPaginasADM($id){
+        $result = array();
+        $cmd = $this->pdo->prepare("SELECT nivacpg.dropdown, nivacpg.lib_menu, nivacpg.adms_niveis_acesso_id
+        FROM adms_nivacs_pgs nivacpg
+        WHERE nivacpg.id=:id LIMIT 1");
+        $cmd->bindValue(":id", $id, PDO::PARAM_INT);
+        $cmd->execute();
+        $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+    }
+
+    public function PesuisaDadosNiveisAcessoPaginas($id, $ordem){
+        $result = array();
+        $cmd = $this->pdo->prepare("SELECT nivacpg.dropdown, nivacpg.lib_menu, nivacpg.adms_niveis_acesso_id
+        FROM adms_nivacs_pgs nivacpg
+        INNER JOIN adms_niveis_acessos nivac ON nivac.id=nivacpg.adms_niveis_acesso_id
+        WHERE nivacpg.id=:id AND nivac.ordem > :ordem LIMIT 1");
+        $cmd->bindValue(":id", $id, PDO::PARAM_INT);
+        $cmd->bindValue("ordem", $ordem);
+        $cmd->execute();
+        $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+    }
+
+    public function atualizarLiberarMenu($status,$id){
+        $cmd = $this->pdo->prepare("UPDATE adms_nivacs_pgs SET lib_menu=:estatus, modified=NOW()
+        WHERE id=:id");
+        $cmd->bindValue(":estatus", $status, PDO::PARAM_INT);
+        $cmd->bindValue(":id", $id, PDO::PARAM_INT);
+        $cmd->execute();
+        return true;
+    }
+
+    public function atualizarLiberMenuDropdown($status,$id){
+        $cmd = $this->pdo->prepare("UPDATE adms_nivacs_pgs SET dropdown=:estatus, modified=NOW()
+        WHERE id=:id");
+        $cmd->bindValue(":estatus", $status, PDO::PARAM_INT);
+        $cmd->bindValue(":id", $id, PDO::PARAM_INT);
         $cmd->execute();
         return true;
     }

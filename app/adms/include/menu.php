@@ -9,7 +9,7 @@ require_once '../adm/index.php';
         <ul class="list-unstyled">
             <?php
             //chama a funcao que busca os botoes do meno cadastrados no banco.
-            $result_niveis_acessos_pgs = $pdo->buscarBotoesMenu();
+            $result_niveis_acessos_pgs = $pdo->buscarBotoesMenu($_SESSION['adms_niveis_acesso_id']);
 
             //essas variaveis são para fazer a logica da impressao do dropdown.
             $cont_drop_fech = 0;
@@ -22,6 +22,7 @@ require_once '../adm/index.php';
 
                 //esse if verifica qual pagina esta ativa no momento
                 //usei o for para percorrer o array de result_paginas.
+                /* */
                 for ($c = 0; $c < count($result_paginas); $c++) {
                     if ($result_paginas[$c]['id'] == $result_niveis_acessos_pgs[$i]['id_pg_menu']) {
                         $menu_ativado = "active";
