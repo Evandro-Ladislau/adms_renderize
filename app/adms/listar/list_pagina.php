@@ -56,7 +56,7 @@ include_once 'app/adms/include/head.php';
                     //chamei a funcao que busca a paginacao conforme nivel de acesso.
                     $result_paginacaoNivelAcessoPagina = $pdo->paginacaoNivelAcessoPaginas($inicio, $qnt_result_pg);
                 } else {
-                    $result_paginacaoNivelAcessoPagina = $pdo->paginacaoNivelAcessoLimitado($inicio, $qnt_result_pg);
+                    $result_paginacaoNivelAcessoPagina = $pdo->paginacaoNivelAcessoLimitado($inicio, $qnt_result_pg, $_SESSION['ordem']);
                 }
 
                 if ($result_paginacaoNivelAcessoPagina) {

@@ -25,10 +25,15 @@ include_once 'app/adms/include/head.php';
                     </div>
                     <div class="p-2">
                         <?php
+                         $btn_sincro = $pdo->carregarBtn('processa/proc_sincro_nivac_pg');
+
+                         if ($btn_sincro) {
+                             echo "<a href='" . pg . "/processa/proc_sincro_nivac_pg' class='btn btn-outline-success btn-sm'> Sincronizar </a> ";
+                         }
                         $btn_cad = $pdo->carregarBtn('cadastrar/cad_niv_aces');
 
                         if ($btn_cad) {
-                            echo "<a href='" . pg . "/cadastrar/cad_niv_aces' class='btn btn-outline-success btn-sm'>Cadastar</a>";
+                            echo "<a href='" . pg . "/cadastrar/cad_niv_aces' class='btn btn-outline-success btn-sm'> Cadastar </a>";
                         }
                         ?>
 

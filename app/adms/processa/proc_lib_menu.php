@@ -13,12 +13,12 @@ if (!empty($id)) {
     //quando for administrado cai nesse if
     if ($_SESSION['adms_niveis_acesso_id'] == 1) {
         //Pesquisar os dados da tabela adms_nivacs_pgs
-        $result_niv_ac_pg = $pdo->PesuisaDadosNiveisAcessoPaginasADM($id);
-        var_dump($result_niv_ac_pg);
+        $result_niv_ac_pg = $pdo->PesquisaDadosNiveisAcessoPaginasADM($id);
+        //var_dump($result_niv_ac_pg);
     } else {
         //quando não for administrador cai nesse else
         //Pesquisar os dados da tabela adms_nivacs_pgs
-        $result_niv_ac_pg = $pdo->PesuisaDadosNiveisAcessoPaginas($id, $_SESSION['ordem']);
+        $result_niv_ac_pg = $pdo->PesquisaDadosNiveisAcessoPaginas($id, $_SESSION['ordem']);
     }
 
     //Verificar se retornou algum valor do banco de dados. IF se sim, Else se não.

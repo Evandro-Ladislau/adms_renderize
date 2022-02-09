@@ -629,19 +629,16 @@ class Conexao
 
     public function permissaoSuperAdministrador($id, $inicio, $qnt_result_pg){
         $result = array();
-        $cmd = $this->pdo->prepare("SELECT nivpg.* ,
-        pg.nome_pagina, pg.obs
-        FROM adms_nivacs_pgs nivpg
-        INNER JOIN adms_paginas pg ON pg.id=nivpg.adms_pagina_id
-        WHERE nivpg.adms_niveis_acesso_id=:id AND pg.depend_pg=0
-        ORDER BY nivpg.ordem ASC 
-        LIMIT :inicio, :qnt_result_pg");
+        $cmd = $this->pdo->prepare("SELECT * FROM adms_nivacs_pgs 
+        WHERE adms_niveis_acesso_id=:id 
+        ORDER BY ordem ASC LIMIT :inicio, :qnt_result_pg");
         $cmd->bindValue(":id", $id, PDO::PARAM_INT);
         $cmd->bindValue(":inicio", $inicio, PDO::PARAM_INT);
         $cmd->bindValue(":qnt_result_pg", $qnt_result_pg, PDO::PARAM_INT);
         $cmd->execute();
         $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
         return $result;
+        
     }
 
     public function nomeNivelAcesso($id){
@@ -716,7 +713,7 @@ class Conexao
         return true;
     }
 
-    public function PesuisaDadosNiveisAcessoPaginasADM($id){
+    public function PesquisaDadosNiveisAcessoPaginasADM($id){
         $result = array();
         $cmd = $this->pdo->prepare("SELECT nivacpg.dropdown, nivacpg.lib_menu, nivacpg.adms_niveis_acesso_id
         FROM adms_nivacs_pgs nivacpg
@@ -727,7 +724,7 @@ class Conexao
         return $result;
     }
 
-    public function PesuisaDadosNiveisAcessoPaginas($id, $ordem){
+    public function PesquisaDadosNiveisAcessoPaginas($id, $ordem){
         $result = array();
         $cmd = $this->pdo->prepare("SELECT nivacpg.dropdown, nivacpg.lib_menu, nivacpg.adms_niveis_acesso_id
         FROM adms_nivacs_pgs nivacpg
@@ -754,6 +751,138 @@ class Conexao
         WHERE id=:id");
         $cmd->bindValue(":estatus", $status, PDO::PARAM_INT);
         $cmd->bindValue(":id", $id, PDO::PARAM_INT);
+        $cmd->execute();
+        return true;
+    }
+
+    public function pesquisarAcessoPaginaAcoesADM($id){
+        $result = array();
+        $cmd = $this->pdo->prepare("SELECT id, ordem, adms_niveis_acesso_id		
+        FROM adms_nivacs_pgs
+        WHERE id=:id LIMIT 1");
+        $cmd->bindValue(":id", $id, PDO::PARAM_INT);
+        $cmd->execute();
+        $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+    }
+
+    public function pesquisarAcessoPaginaAcoes($id,$ordem){
+        $result = array();
+        $cmd = $this->pdo->prepare("SELECT nivacpg.id, nivacpg.ordem, nivacpg.adms_niveis_acesso_id
+        FROM adms_nivacs_pgs nivacpg
+        INNER JOIN adms_niveis_acessos nivac ON nivac.id=nivacpg.adms_niveis_acesso_id
+        WHERE nivacpg.id=:id AND nivac.ordem > :ordem LIMIT 1");
+        $cmd->bindValue(":id", $id, PDO::PARAM_INT);
+        $cmd->bindValue(":ordem", $ordem, PDO::PARAM_INT);
+        $cmd->execute();
+        $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+
+    }
+
+    public function pesquisarIdParaSerMovido($ordem, $adms_niveis_acesso_id){
+        $result = array();
+        $cmd = $this->pdo->prepare("SELECT id, ordem FROM adms_nivacs_pgs
+        WHERE ordem=:ordem AND adms_niveis_acesso_id=:adms_niveis_acesso_id LIMIT 1");
+        $cmd->bindValue(":ordem", $ordem, PDO::PARAM_INT);
+        $cmd->bindValue(":adms_niveis_acesso_id", $adms_niveis_acesso_id, PDO::PARAM_INT);
+        $cmd->execute();
+        $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+    }
+
+    public function alterarOrdemMaiorParaMenor($ordem_num_menor, $id){
+        $cmd = $this->pdo->prepare("UPDATE adms_nivacs_pgs SET ordem=:ordem_num_menor, modified=NOW()
+        WHERE id=:id ");
+        $cmd->bindValue(":ordem_num_menor", $ordem_num_menor, PDO::PARAM_INT);
+        $cmd->bindValue(":id", $id, PDO::PARAM_INT);
+        $cmd->execute();
+        return true;
+    }
+
+    public function alterarOrdemMenorParaMaior($ordem, $id){
+        $cmd = $this->pdo->prepare("UPDATE adms_nivacs_pgs SET ordem=:ordem, modified=NOW()
+        WHERE id=:id");
+        $cmd->bindValue(":ordem", $ordem, PDO::PARAM_INT);
+        $cmd->bindValue(":id", $id, PDO::PARAM_INT);
+        $cmd->execute();
+        return true;
+    }
+
+    public function PesquisarNiveisAcesso(){
+        $result = array();
+        $cmd = $this->pdo->prepare("SELECT id, nome FROM adms_niveis_acessos");
+        $cmd->execute();
+        $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+    }
+
+
+    public function pesquisarPaginasSincrono(){
+        $result = array();
+        $cmd = $this->pdo->prepare("SELECT id, lib_pub FROM adms_paginas");
+        $cmd->execute();
+        $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+    }
+
+    public function pesquisarInscricaoNivac($id,$paginas_id){
+        $result = array();
+        $cmd = $this->pdo->prepare("SELECT id FROM adms_nivacs_pgs
+        WHERE adms_niveis_acesso_id=:id AND adms_pagina_id=:paginas_id ORDER BY id ASC LIMIT 1");
+        $cmd->bindValue(":id", $id, PDO::PARAM_INT);
+        $cmd->bindValue(":paginas_id", $paginas_id, PDO::PARAM_INT);
+        $cmd->execute();
+        $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+    }
+
+    public function pesquisarMaiorOrdemSincrono(){
+        $result = array();
+        $cmd = $this->pdo->prepare("SELECT ordem FROM adms_nivacs_pgs
+        ORDER BY id DESC LIMIT 1");
+        //$cmd->bindValue(":id", $id, PDO::PARAM_INT);
+        $cmd->execute();
+        $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+    }
+
+    public function pesquisarPaginaItemMenu($id){
+        $result = array();
+        $cmd = $this->pdo->prepare("SELECT adms_menu_id FROM adms_nivacs_pgs
+        WHERE adms_pagina_id=:id ORDER BY id DESC LIMIT 1");
+        $cmd->bindValue(":id", $id);
+        $cmd->execute();
+        $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+    }
+
+    public function cadastrarPermisaoAcessarAdmsNivac( $permissao, $ordem, $item_men, $niv_acesso_id, $pagina_id){
+        $cmd = $this->pdo->prepare("INSERT INTO adms_nivacs_pgs 
+        (permissao,
+         ordem, 
+         dropdown, 
+         lib_menu, 
+         adms_menu_id, 
+         adms_niveis_acesso_id, 
+         adms_pagina_id, 
+         created) 
+         VALUES(
+            :permissao,
+            :ordem,
+            1,
+            2,
+            :item_men,
+            :niv_acesso_id,
+            :pagina_id,
+            NOW() )
+        )");
+
+        $cmd->bindValue(":permissao", $permissao, PDO::PARAM_INT);
+        $cmd->bindValue(":ordem", $ordem, PDO::PARAM_INT);
+        $cmd->bindValue(":item_men", $item_men, PDO::PARAM_INT);
+        $cmd->bindValue(":niv_acesso_id", $niv_acesso_id, PDO::PARAM_INT);
+        $cmd->bindValue(":pagina_id", $pagina_id, PDO::PARAM_INT);
         $cmd->execute();
         return true;
     }
