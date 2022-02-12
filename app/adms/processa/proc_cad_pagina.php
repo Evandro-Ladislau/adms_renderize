@@ -101,8 +101,10 @@ if ($SendCadPg) {
                     $permissao = 2;
                 }
                 
-                //Pesquisar o maior numero da ordem na tabela  adms_nivacs_pgs (para o nivel de acesso em eecução, é realmente necessario verificar se o nivel de acesso é igual o nive do usuario em execucao?)
-                $result_maior_ordem = $pdo->maiorNumeroOrdemAdmsNivAcs();
+                //Pesquisar o maior numero da ordem na tabela  adms_nivacs_pgs (para o nivel de acesso em eecução, é realmente necessario verificar se o nivel de acesso é igual o nive do usuario em execucao? SIIIMM)
+                //elle vai cadastrar a ordem da permissão em um valor a + do que já existe para aquele nível específico, independente se ouver numeros maiores ou menores em outros niveis
+                //cada nível de acesso tem a sua ordem continua
+                $result_maior_ordem = $pdo->maiorNumeroOrdemAdmsNivAcs($result_niv_acesso[$i]['id']);
                 $ordem = $result_maior_ordem[0]['ordem'] + 1;
                 
                 

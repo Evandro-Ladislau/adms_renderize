@@ -56,7 +56,7 @@ include_once 'app/adms/include/head.php';
                     //chamei a funcao que busca a paginacao conforme nivel de acesso.
                     $result_paginacaoNivelAcessoPagina = $pdo->paginacaoNivelAcessoPaginas($inicio, $qnt_result_pg);
                 } else {
-                    $result_paginacaoNivelAcessoPagina = $pdo->paginacaoNivelAcessoLimitado($inicio, $qnt_result_pg, $_SESSION['ordem']);
+                    $result_paginacaoNivelAcessoPagina = $pdo->paginacaoNivelAcessoPermissao($inicio, $qnt_result_pg, $_SESSION['ordem']);
                 }
 
                 if ($result_paginacaoNivelAcessoPagina) {
@@ -79,7 +79,7 @@ include_once 'app/adms/include/head.php';
                                 for ($i = 0; $i < count($result_paginacaoNivelAcessoPagina); $i++) {
                                 ?>
                                     <tr>
-                                        <th><?php echo $result_paginacaoNivelAcessoPagina[$i]['id'] ?></th>
+                                        <th><?php echo $result_paginacaoNivelAcessoPagina[$i]['id'];?></th>
                                         <td><?php echo $result_paginacaoNivelAcessoPagina[$i]['nome_pagina'] ?></td>
                                         <td class="d-none d-sm-table-cell"><?php echo $result_paginacaoNivelAcessoPagina[$i]['endereco'] ?></td>
                                         <td class="d-none d-sm-table-cell"><?php echo $result_paginacaoNivelAcessoPagina[$i]['tipo'] ?></td>

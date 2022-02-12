@@ -148,6 +148,7 @@ class Conexao
         return $result;
     }
 
+
     //funcao count conta a coluna id e o resultado é atribuido para um apelido(num_result).
     public function paginacao()
     {
@@ -355,6 +356,25 @@ class Conexao
         return $result;
     }
 
+    public function paginacaoNivelAcessoPermissao($inicio, $qnt_result_pg,  $ordem)
+    {
+        $result = array();
+        $cmd = $this->pdo->prepare("SELECT pg.id, pg.nome_pagina, pg.endereco, tpg.tipo
+        FROM adms_paginas pg 
+        INNER JOIN adms_nivacs_pgs nivac ON nivac.adms_pagina_id=pg.id 
+        INNER JOIN adms_niveis_acessos nivacess ON nivacess.id = nivac.adms_niveis_acesso_id
+        INNER JOIN adms_tps_pg tpg ON tpg.id=pg.adms_tps_pg_id
+        WHERE nivac.adms_niveis_acesso_id > :ordem
+        ORDER BY id
+        ASC LIMIT :inicio, :qnt_result_pg");
+        $cmd->bindValue(":ordem", $ordem, PDO::PARAM_INT);
+        $cmd->bindValue(":inicio", $inicio, PDO::PARAM_INT);
+        $cmd->bindParam(":qnt_result_pg", $qnt_result_pg, PDO::PARAM_INT);
+        $cmd->execute();
+        $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+    }
+
     //funcao count conta a coluna id e o resultado é atribuido para um apelido(num_result).
     public function paginacaoPaginas()
     {
@@ -481,11 +501,13 @@ class Conexao
         return $result;
     }
 
-    public function maiorNumeroOrdemAdmsNivAcs()
+    public function maiorNumeroOrdemAdmsNivAcs($result_niv_acesso)
     {
         $result = array();
         $cmd = $this->pdo->prepare("SELECT ordem FROM adms_nivacs_pgs 
+        WHERE adms_niveis_acesso_id=:result_niv_acesso
         ORDER BY ordem DESC LIMIT 1 ");
+        $cmd->bindValue(":result_niv_acesso", $result_niv_acesso, PDO::PARAM_INT);
         $cmd->execute();
         $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
         return $result;
@@ -629,9 +651,13 @@ class Conexao
 
     public function permissaoSuperAdministrador($id, $inicio, $qnt_result_pg){
         $result = array();
-        $cmd = $this->pdo->prepare("SELECT * FROM adms_nivacs_pgs 
-        WHERE adms_niveis_acesso_id=:id 
-        ORDER BY ordem ASC LIMIT :inicio, :qnt_result_pg");
+        $cmd = $this->pdo->prepare("SELECT nivpg.* ,
+        pg.nome_pagina, pg.obs
+        FROM adms_nivacs_pgs nivpg
+        INNER JOIN adms_paginas pg ON pg.id=nivpg.adms_pagina_id
+        WHERE nivpg.adms_niveis_acesso_id=:id AND pg.depend_pg=0
+        ORDER BY nivpg.ordem ASC 
+        LIMIT :inicio, :qnt_result_pg");
         $cmd->bindValue(":id", $id, PDO::PARAM_INT);
         $cmd->bindValue(":inicio", $inicio, PDO::PARAM_INT);
         $cmd->bindValue(":qnt_result_pg", $qnt_result_pg, PDO::PARAM_INT);
@@ -837,11 +863,12 @@ class Conexao
         return $result;
     }
 
-    public function pesquisarMaiorOrdemSincrono(){
+    public function pesquisarMaiorOrdemSincrono($id){
         $result = array();
         $cmd = $this->pdo->prepare("SELECT ordem FROM adms_nivacs_pgs
+        WHERE adms_niveis_acesso_id=:id
         ORDER BY id DESC LIMIT 1");
-        //$cmd->bindValue(":id", $id, PDO::PARAM_INT);
+        $cmd->bindValue(":id", $id, PDO::PARAM_INT);
         $cmd->execute();
         $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
         return $result;
