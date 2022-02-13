@@ -854,7 +854,7 @@ class Conexao
 
     public function pesquisarInscricaoNivac($id,$paginas_id){
         $result = array();
-        $cmd = $this->pdo->prepare("SELECT id FROM adms_nivacs_pgs
+        $cmd = $this->pdo->prepare("SELECT id, adms_niveis_acesso_id FROM adms_nivacs_pgs
         WHERE adms_niveis_acesso_id=:id AND adms_pagina_id=:paginas_id ORDER BY id ASC LIMIT 1");
         $cmd->bindValue(":id", $id, PDO::PARAM_INT);
         $cmd->bindValue(":paginas_id", $paginas_id, PDO::PARAM_INT);
@@ -884,32 +884,38 @@ class Conexao
         return $result;
     }
 
-    public function cadastrarPermisaoAcessarAdmsNivac( $permissao, $ordem, $item_men, $niv_acesso_id, $pagina_id){
+    public function cadastrarPermissaoAcessoUsuario(
+        $permissao,
+        $ordem,
+        $item_menu,
+        $result_niv_acesso_id,
+        $pagina_id
+    ) {
+
         $cmd = $this->pdo->prepare("INSERT INTO adms_nivacs_pgs 
-        (permissao,
-         ordem, 
-         dropdown, 
-         lib_menu, 
-         adms_menu_id, 
-         adms_niveis_acesso_id, 
-         adms_pagina_id, 
-         created) 
-         VALUES(
-            :permissao,
-            :ordem,
-            1,
-            2,
-            :item_men,
-            :niv_acesso_id,
-            :pagina_id,
-            NOW() )
-        )");
+        (	permissao, 
+            ordem, 
+            dropdown, 
+            lib_menu, 
+            adms_menu_id, 
+            adms_niveis_acesso_id, 
+            adms_pagina_id, 
+            created	) 
+            VALUES (
+                :permissao, 
+                :ordem, 
+                1, 
+                2, 
+                :adms_menu_id, 
+                :adms_niveis_acesso_id, 
+                :adms_pagina_id, 
+                NOW())");
 
         $cmd->bindValue(":permissao", $permissao, PDO::PARAM_INT);
         $cmd->bindValue(":ordem", $ordem, PDO::PARAM_INT);
-        $cmd->bindValue(":item_men", $item_men, PDO::PARAM_INT);
-        $cmd->bindValue(":niv_acesso_id", $niv_acesso_id, PDO::PARAM_INT);
-        $cmd->bindValue(":pagina_id", $pagina_id, PDO::PARAM_INT);
+        $cmd->bindValue(":adms_menu_id", $item_menu, PDO::PARAM_INT);
+        $cmd->bindValue(":adms_niveis_acesso_id", $result_niv_acesso_id, PDO::PARAM_INT);
+        $cmd->bindValue(":adms_pagina_id", $pagina_id, PDO::PARAM_INT);
         $cmd->execute();
         return true;
     }
