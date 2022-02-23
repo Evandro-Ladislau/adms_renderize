@@ -171,6 +171,14 @@ if (!empty($id)) {
                                             <td class="d-none d-sm-table-cell"><?php echo $result_niv_ac[$i]['ordem']; ?></td>
                                             <td class="d-none d-sm-table-cell">
                                                 <?php 
+
+                                                $btn_edit = $pdo->carregarBtn('editar/edit_permissao');
+                                                if ($btn_edit) {
+                                                    echo " <a href='".pg."/editar/edit_permissao?id=".$result_niv_ac[$i]['id']."' class='btn btn-outline-warning btn-sm ' > Editar </a> ";
+                                                    
+                                                }
+                                                
+
                                                  $btn_ordem_menu = $pdo->carregarBtn('processa/proc_ordem_menu');
                                                  if ($btn_ordem_menu) {
                                                      if ($qnt_linhas_exe == 1) {

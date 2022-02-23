@@ -919,4 +919,27 @@ class Conexao
         $cmd->execute();
         return true;
     }
+
+
+    public function editarPaginaPermissao($id){
+        $result = array();
+        $cmd = $this->pdo->prepare("SELECT pg.icone, nivpg.id, nivpg.adms_menu_id, nivpg.adms_niveis_acesso_id
+        FROM adms_paginas pg
+        INNER JOIN adms_nivacs_pgs nivpg ON nivpg.adms_pagina_id=pg.id
+        WHERE nivpg.id=:id LIMIT 1");
+        $cmd->bindValue(":id", $id, PDO::PARAM_INT);
+        $cmd->execute();
+        $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+    }
+
+    public function resultadoMenus(){
+        $result = array();
+        $cmd = $this->pdo->prepare("SELECT * FROM adms_menus");
+        $cmd->execute();
+        $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+    }
 }
+
+
