@@ -940,6 +940,104 @@ class Conexao
         $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
         return $result;
     }
+
+    public function AlterMenu($dados_validos_adms_menu_id, $dados_validos_id){
+        $cmd = $this->pdo->prepare("UPDATE adms_nivacs_pgs SET 
+        adms_menu_id=:dados_validos_adms_menu_id, modified=NOW()
+        WHERE id=:dados_validos_id");
+        $cmd->bindValue(":dados_validos_adms_menu_id", $dados_validos_adms_menu_id, PDO::PARAM_INT);
+        $cmd->bindValue(":dados_validos_id", $dados_validos_id, PDO::PARAM_INT);
+        $cmd->execute();
+        return true;
+    }
+
+    public function PesquisarIdNivelAc($dados_validos_id){
+        $result = array();
+        $cmd = $this->pdo->prepare("SELECT adms_niveis_acesso_id, adms_pagina_id 
+        FROM adms_nivacs_pgs 
+        WHERE id=:dados_validos_id 
+        LIMIT 1");
+        $cmd->bindValue(":dados_validos_id", $dados_validos_id, PDO::PARAM_INT);
+        $cmd->execute();
+        $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+    }
+
+    public function AlterarIcone($dados_icone, $vetor_resultado_nivpg_adms_pagina_id){
+        $cmd = $this->pdo->prepare("UPDATE adms_paginas SET 
+        icone=:dados_icone
+        modified=NOW()
+        WHERE id=:vetor_resultado_nivpg_adms_pagina_id");
+        $cmd->bindValue(":dados_icone", $dados_icone, PDO::PARAM_STR);
+        $cmd->bindValue(":vetor_resultado_nivpg_adms_pagina_id", $vetor_resultado_nivpg_adms_pagina_id, PDO::PARAM_INT);
+        $cmd->execute();
+        return true;
+    }
+
+    public function buscarDadosMenu($inicio,  $qnt_result_pg){
+        $result = array();
+        $cmd = $this->pdo->prepare("SELECT * FROM adms_menus ORDER BY ordem ASC LIMIT :inicio, :qnt_result_pg ");
+        $cmd->bindValue(":inicio", $inicio, PDO::PARAM_INT);
+        $cmd->bindValue(":qnt_result_pg", $qnt_result_pg, PDO::PARAM_INT);
+        $cmd->execute();
+        $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+    }
+
+    public function paginacao_menu()
+    {
+        $result = array();
+        $cmd = $this->pdo->query("SELECT COUNT(id) AS num_result FROM adms_menus");
+        $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+    }
+
+    public function listarSituacaoMenu()
+    {
+        $result = array();
+        $cmd = $this->pdo->query("SELECT id, nome FROM  adms_sits ORDER BY nome ASC");
+        $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+    }
+
+    public function MaiorOrdemMenu(){
+        $result = array();
+        $cmd = $this->pdo->query("SELECT ordem FROM adms_menus ");
+        $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+    }
+
+    public function CadastrarMenu(
+        $nome,
+        $icone,
+        $ordem,
+        $adms_sit_id
+        )
+        {
+        $cmd = $this->pdo->prepare("INSERT INTO adms_menus 
+        (
+            nome,
+            icone,
+            ordem,
+            adms_sit_id,
+            created
+            )
+            VALUES 
+            ( 
+                :nome,
+                :icone,
+                :ordem,
+                :adms_sit_id,
+                NOW()
+            )
+             ");
+        $cmd->bindValue(":nome", $nome, PDO::PARAM_STR);
+        $cmd->bindValue(":icone", $icone, PDO::PARAM_STR);
+        $cmd->bindValue(":ordem", $ordem, PDO::PARAM_INT);
+        $cmd->bindValue(":adms_sit_id", $adms_sit_id, PDO::PARAM_INT);
+        $cmd->execute();
+        return true;     
+    }
 }
 
 

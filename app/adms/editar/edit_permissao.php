@@ -64,9 +64,7 @@ if (!empty($id)) {
 
                                         ?>
                                     </div>
-                                <?php
-                                    }
-                                ?>
+                                
                                 </div>
                             </div>
                         </div>
@@ -78,8 +76,13 @@ if (!empty($id)) {
                             unset($_SESSION['msg']);
                         }
                         ?>
+                        
                         <form method="POST" action="<?php echo pg; ?>/processa/proc_edit_permissao">
-                            <input type="hidden" name="id" value="<?php echo $result_edit_pg[$i]['id']; ?>">
+                            <input type="hidden" name="id" value="<?php 
+                           
+                                echo $result_edit_pg[$i]['id'];
+                            
+                             ?>">
                             <div class="form-row">
                             <div class="form-group col-md-6">
                                 <label>
@@ -87,16 +90,15 @@ if (!empty($id)) {
                                         <i class="fas fa-question-circle"></i>
                                     </span> Ícone
                                 </label>
-                                <input name="icone" type="text" class="form-control" placeholder="Página de ícone" value="<?php
-                                                                                                                            for ($j = 0; $j < count($result_edit_pg); $j++) {
+                                <input  name="icone" type="text" class="form-control" placeholder="Ícone da página" value="<?php
+                                                                                                                            
                                                                                                                                 if (isset($_SESSION['dados']['icone'])) {
                                                                                                                                     echo $_SESSION['dados']['icone'];
-                                                                                                                                } elseif (isset($result_edit_pg[$j]['icone'])) {
-                                                                                                                                    echo $result_edit_pg[$j]['icone'];
+                                                                                                                                } elseif (isset($result_edit_pg[$i]['icone'])) {
+                                                                                                                                    echo $result_edit_pg[$i]['icone'];
                                                                                                                                 }
-                                                                                                                            }
-                                                                                                                            ?>
-                                ">
+                                                                                                                            
+                                                                                                                            ?>">
                             </div>
 
                             <div class="form-group col-md-6">
@@ -116,10 +118,10 @@ if (!empty($id)) {
                                             echo "<option value='" . $result_menus[$c]['id'] . "'selected>" . $result_menus[$c]['nome'] . "</option>";
                                         }
                                         //Preencher com informações do banco de dados caso não tenha nenhum valor salvo na sessão $_SESSION['dados']
-                                        elseif (!isset($_SESSION['dados']['adms_menu_id']) and isset($result_menus['adms_menu_id']) and ($result_menus['adms_menu_id'] == $result_menus['id'])) {
+                                        elseif (!isset($_SESSION['dados']['adms_menu_id']) and isset($result_edit_pg[$i]['adms_menu_id']) and ($result_edit_pg[$i]['adms_menu_id'] == $result_menus[$c]['id'])) {
                                             echo "<option value='" . $result_menus[$c]['id'] . "' selected>" . $result_menus[$c]['nome'] . "</option>";
                                         } else {
-                                            echo "<option value='" . $result_menu[$c]['id'] . "'>" . $result_menus[$c]['nome'] . "</option>";
+                                            echo "<option value='" . $result_menus[$c]['id'] . "'>" . $result_menus[$c]['nome'] . "</option>";
                                         }
                                     }
                                     ?>
@@ -127,9 +129,11 @@ if (!empty($id)) {
                             </div>
                             </div>
                             <p><span class="text-danger">*</span> Campo Obrigatório</p>
-                            <input name="SendEditNivAC" type="submit" class="btn btn-warning" value="Salvar">
+                            <input name="SendEditPermissao" type="submit" class="btn btn-warning" value="Salvar">
                         </form>
-
+                        <?php
+                                    }
+                                ?>            
                     </div>
                 </div>
             </div>
