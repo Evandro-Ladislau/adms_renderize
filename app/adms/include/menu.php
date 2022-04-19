@@ -10,7 +10,7 @@ require_once '../adm/index.php';
             <?php
             //chama a funcao que busca os botoes do meno cadastrados no banco.
             $result_niveis_acessos_pgs = $pdo->buscarBotoesMenu($_SESSION['adms_niveis_acesso_id']);
-
+            
             //essas variaveis são para fazer a logica da impressao do dropdown.
             $cont_drop_fech = 0;
             $cont_drop = 0;

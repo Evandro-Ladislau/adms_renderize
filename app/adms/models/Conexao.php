@@ -1038,6 +1038,230 @@ class Conexao
         $cmd->execute();
         return true;     
     }
+
+    public function VerificarMenusCadastradosNoBanco($id)
+    {
+        $result = array();
+        $cmd = $this->pdo->prepare("SELECT * FROM adms_menus WHERE id=:id LIMIT 1");
+        $cmd->bindValue(":id", $id, PDO::PARAM_INT);
+        $cmd->execute();
+        $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+    }
+
+
+    public function EditarMenu(
+        $nome,
+        $icone,
+        $adms_sit_id,
+        $id
+    ) {
+        $cmd = $this->pdo->prepare("UPDATE adms_menus SET 
+        nome=:nome,
+        icone=:icone,
+        adms_sit_id=:adms_sit_id,
+        modified=NOW() WHERE id=:id");
+
+        $cmd->bindValue(":nome", $nome, PDO::PARAM_STR);
+        $cmd->bindValue(":icone", $icone, PDO::PARAM_STR);
+        $cmd->bindValue(":adms_sit_id", $adms_sit_id, PDO::PARAM_INT);
+        $cmd->bindValue(":id", $id, PDO::PARAM_INT);
+        $cmd->execute();
+        return true;
+    }
+
+    public function pesquisarMenuCadastrado($id)
+    {
+        $result = array();
+        $cmd = $this->pdo->prepare("SELECT men.* ,
+        sit.nome nome_sit,
+        cors.cor cor_cores
+        FROM adms_menus men
+        INNER JOIN adms_sits sit ON sit.id=men.adms_sit_id
+        INNER JOIN adms_cors cors	ON cors.id=sit.adms_cor_id
+        WHERE men.id=:id LIMIT 1");
+        $cmd->bindValue(":id", $id, PDO::PARAM_INT);
+        $cmd->execute();
+        $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+    }
+
+
+    public function verificarNivelMenuCadastrado($id)
+    {
+        $result = array();
+        $cmd = $this->pdo->prepare("SELECT id FROM adms_nivacs_pgs WHERE adms_menu_id=:id LIMIT 1 ");
+        $cmd->bindValue("id", $id, PDO::PARAM_INT);
+        $cmd->execute();
+        $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+    }
+
+    public function buscarOrdemMenuCadastrado($id)
+    {
+        $result = array();
+        $cmd = $this->pdo->prepare("SELECT id, ordem AS ordem_result 
+        FROM adms_menus 
+        WHERE ordem > (SELECT ordem FROM adms_menus WHERE id=:id) ORDER BY ordem ASC");
+        $cmd->bindValue(":id", $id);
+        $cmd->execute();
+        $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+    }
+
+    public function deletarMenu($id)
+    {
+        $cmd = $this->pdo->prepare("DELETE FROM adms_menus WHERE id=:id");
+        $cmd->bindValue(":id", $id, PDO::PARAM_INT);
+        $cmd->execute();
+        return true;
+    }
+
+    public function atualizaOrdemMenu($ordem, $id)
+    {
+        $cmd = $this->pdo->prepare("UPDATE  adms_menus SET 
+        ordem=:ordem, modified=NOW()
+        WHERE id=:id");
+        $cmd->bindValue(":ordem", $ordem, PDO::PARAM_INT);
+        $cmd->bindValue(":id", $id, PDO::PARAM_INT);
+        $cmd->execute();
+        return true;
+    }
+
+    public function alterarOrdemMenu($id)
+    {
+        $result = array();
+        $cmd = $this->pdo->prepare("SELECT id, ordem FROM adms_menus WHERE id=:id LIMIT 1");
+        $cmd->bindValue(":id", $id, PDO::PARAM_INT);
+        $cmd->execute();
+        $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+    }
+
+    public function pesquisarIdMenuAcessoMovido($ordem_super)
+    {
+        $result = array();
+        $cmd = $this->pdo->prepare("SELECT id, ordem FROM adms_menus WHERE ordem=:ordem_super LIMIT 1");
+        $cmd->bindValue(":ordem_super", $ordem_super, PDO::PARAM_INT);
+        $cmd->execute();
+        $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+    }
+
+    public function altualizaOrdemMenuAcessoMaior($ordem, $niv_super)
+    {
+        $cmd = $this->pdo->prepare("UPDATE adms_menus SET ordem=:ordem, modified=NOW() 
+        WHERE id=:niv_super");
+        $cmd->bindValue(":ordem", $ordem, PDO::PARAM_INT);
+        $cmd->bindValue(":niv_super", $niv_super, PDO::PARAM_INT);
+        $cmd->execute();
+        return true;
+    }
+
+    public function altualizaOrdemMenuAcessoMenor($ordem_super, $ordem_niv_atual)
+    {
+        $cmd = $this->pdo->prepare("UPDATE adms_menus SET ordem=:ordem_super, modified=NOW() 
+        WHERE id=:ordem_niv_atual");
+        $cmd->bindValue(":ordem_super", $ordem_super, PDO::PARAM_INT);
+        $cmd->bindValue(":ordem_niv_atual", $ordem_niv_atual, PDO::PARAM_INT);
+        $cmd->execute();
+        return true;
+    }
+
+    public function paginacaoUsuarioSuper($inicio, $qnt_result_pg)
+    {
+        $result = array();
+        $cmd = $this->pdo->prepare("SELECT user.id, user.nome, user.email,
+        nivac.nome nome_nivac
+        FROM adms_usuarios user
+        INNER JOIN adms_niveis_acessos nivac ON nivac.id=user.adms_niveis_acesso_id
+        ORDER BY user.id 
+        DESC LIMIT :inicio, :qnt_result_pg");
+        $cmd->bindValue(":inicio", $inicio, PDO::PARAM_INT);
+        $cmd->bindParam(":qnt_result_pg", $qnt_result_pg, PDO::PARAM_INT);
+        $cmd->execute();
+        $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+    }
+
+    public function paginacaoUsuario($inicio, $qnt_result_pg, $ordem)
+    {
+        $result = array();
+        $cmd = $this->pdo->prepare("SELECT user.id, user.nome, user.email,
+        nivac.nome nome_nivac, nivac.ordem
+        FROM adms_usuarios user
+        INNER JOIN adms_niveis_acessos nivac ON nivac.id=user.adms_niveis_acesso_id
+        WHERE nivac.ordem > :ordem
+        ORDER BY user.id 
+        DESC LIMIT :inicio, :qnt_result_pg");
+        $cmd->bindValue(":inicio", $inicio, PDO::PARAM_INT);
+        $cmd->bindParam(":qnt_result_pg", $qnt_result_pg, PDO::PARAM_INT);
+        $cmd->bindValue(":ordem", $ordem, PDO::PARAM_INT);
+        $cmd->execute();
+        $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+    }
+
+
+    public function paginacaoSeletorUsuario()
+    {
+        $result = array();
+        $cmd = $this->pdo->query("SELECT COUNT(id) AS num_result FROM adms_usuarios");
+        $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+    }
+
+    public function BuscarNiveisAcessosCadastrados()
+    {
+        $result = array();
+        $cmd = $this->pdo->query("SELECT id, nome FROM  adms_niveis_acessos ORDER BY nome ASC");
+        $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+    }
+
+    public function BuscarSituacaoUsuarioCadastrado()
+    {
+        $result = array();
+        $cmd = $this->pdo->query("SELECT id, nome FROM  adms_sits_usuarios ORDER BY nome ASC");
+        $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+    }
+    
+    public function validarCadUsuarioDuplicado($email)
+    {
+        $result = array();
+        $cmd = $this->pdo->prepare("SELECT id FROM adms_usuarios 
+        WHERE email=:email ");
+        $cmd->bindValue(":email", $email, PDO::PARAM_STR);
+        $cmd->execute();
+        $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+    }
+
+    public function cadastrarUsuario(
+        $nome,
+        $email,
+        $usuario,
+        $senha,
+        $adms_niveis_acesso_id,
+        $adms_sits_usuario_id
+    ) {
+
+        $cmd = $this->pdo->prepare("INSERT INTO  adms_usuarios 
+        (nome, email, usuario, senha, adms_niveis_acesso_id, adms_sits_usuario_id, created )
+
+        VALUES (:nome, :email, :usuario, :senha, :adms_niveis_acesso_id, :adms_sits_usuario_id, NOW()) ");
+
+        $cmd->bindValue(":nome", $nome, PDO::PARAM_STR);
+        $cmd->bindValue(":email", $email, PDO::PARAM_STR);
+        $cmd->bindValue(":usuario", $usuario, PDO::PARAM_STR);
+        $cmd->bindValue(":senha", $senha, PDO::PARAM_STR);
+        $cmd->bindValue(":adms_niveis_acesso_id", $adms_niveis_acesso_id, PDO::PARAM_INT);
+        $cmd->bindValue(":adms_sits_usuario_id", $adms_sits_usuario_id, PDO::PARAM_INT);
+
+        $cmd->execute();
+        return true;
+    }
 }
 
 

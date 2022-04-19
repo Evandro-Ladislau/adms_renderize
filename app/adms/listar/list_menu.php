@@ -122,7 +122,7 @@ include_once 'app/adms/include/head.php';
                                                 }
 
                                                 //BOTAO PAGAR
-                                                $btn_apagar = $pdo->carregarBtn('processa/apagar_menus');
+                                                $btn_apagar = $pdo->carregarBtn('processa/apagar_menu');
 
                                                 if ($btn_apagar) {
                                                     echo " <a href='" . pg . "/processa/apagar_menu?id=" . $result_menu[$i]['id'] . "' class='btn btn-outline-danger btn-sm' data-confirm='Tem Certeza que deseja excluir o item?'> Apagar </a>";
