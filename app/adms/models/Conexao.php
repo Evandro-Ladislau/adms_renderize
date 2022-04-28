@@ -1176,7 +1176,7 @@ class Conexao
         FROM adms_usuarios user
         INNER JOIN adms_niveis_acessos nivac ON nivac.id=user.adms_niveis_acesso_id
         ORDER BY user.id 
-        DESC LIMIT :inicio, :qnt_result_pg");
+        LIMIT :inicio, :qnt_result_pg");
         $cmd->bindValue(":inicio", $inicio, PDO::PARAM_INT);
         $cmd->bindParam(":qnt_result_pg", $qnt_result_pg, PDO::PARAM_INT);
         $cmd->execute();
@@ -1193,7 +1193,7 @@ class Conexao
         INNER JOIN adms_niveis_acessos nivac ON nivac.id=user.adms_niveis_acesso_id
         WHERE nivac.ordem > :ordem
         ORDER BY user.id 
-        DESC LIMIT :inicio, :qnt_result_pg");
+        LIMIT :inicio, :qnt_result_pg");
         $cmd->bindValue(":inicio", $inicio, PDO::PARAM_INT);
         $cmd->bindParam(":qnt_result_pg", $qnt_result_pg, PDO::PARAM_INT);
         $cmd->bindValue(":ordem", $ordem, PDO::PARAM_INT);
@@ -1227,12 +1227,13 @@ class Conexao
         return $result;
     }
     
-    public function validarCadUsuarioDuplicado($email)
+    public function validarCadUsuarioDuplicado($email, $usuario)
     {
         $result = array();
         $cmd = $this->pdo->prepare("SELECT id FROM adms_usuarios 
-        WHERE email=:email ");
+        WHERE email=:email OR usuario=:usuario ");
         $cmd->bindValue(":email", $email, PDO::PARAM_STR);
+        $cmd->bindValue(":usuario", $usuario, PDO::PARAM_STR);
         $cmd->execute();
         $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
         return $result;
@@ -1258,9 +1259,11 @@ class Conexao
         $cmd->bindValue(":senha", $senha, PDO::PARAM_STR);
         $cmd->bindValue(":adms_niveis_acesso_id", $adms_niveis_acesso_id, PDO::PARAM_INT);
         $cmd->bindValue(":adms_sits_usuario_id", $adms_sits_usuario_id, PDO::PARAM_INT);
-
         $cmd->execute();
-        return true;
+        //apos a execucao da query passei o parametro para pegar o valor do ultimo id cadastrado
+        // e retornei ele mesmo
+        $cmd = $this->pdo->lastInsertId();
+        return $cmd;
     }
 }
 

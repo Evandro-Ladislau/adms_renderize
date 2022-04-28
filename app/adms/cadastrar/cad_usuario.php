@@ -45,7 +45,7 @@ include_once 'app/adms/include/head.php';
                     unset($_SESSION['msg']);
                 }
                 ?>
-                <form method="POST" action="<?php echo pg; ?>/processa/proc_cad_usuario">
+                <form method="POST" action="<?php echo pg; ?>/processa/proc_cad_usuario" enctype="multipart/form-data">
                 <div class="form-row">
                         <div class="form-group col-md-6">
                             <label>
@@ -56,7 +56,7 @@ include_once 'app/adms/include/head.php';
                         </div>
                         <div class="form-group col-md-6">
                             <label><span class="text-danger">*</span> E-mail</label>
-                            <input name="email" type="text" class="form-control" placeholder="Seu Melhor Email de usuário" id="email" value="<?php if (isset( $_SESSION['dados']['email'])){echo  $_SESSION['dados']['email'];}?>">
+                            <input name="email" type="email" class="form-control" placeholder="Seu Melhor Email de usuário" id="email" value="<?php if (isset( $_SESSION['dados']['email'])){echo  $_SESSION['dados']['email'];}?>">
                         </div>
 
                         
@@ -83,6 +83,13 @@ include_once 'app/adms/include/head.php';
                     </div>
 
                     <div class="form-row">
+                        
+                    <div class="form-group col-md-4">
+                            <label>
+                             Foto
+                             <input type="file" name="imagem">
+                            </label>
+                        </div>
                         <div class="form-group col-md-4">
                         <label>
                                 <span class="text-danger">*</span>Nível de Acesso
@@ -124,12 +131,6 @@ include_once 'app/adms/include/head.php';
                                 
                                 ?>
                             </select>
-                        </div>
-
-                        <div class="form-group col-md-4">
-                            <label>
-                            <span class="text-danger">*</span> Foto
-                            </label>
                         </div>
                     </div>
                     
