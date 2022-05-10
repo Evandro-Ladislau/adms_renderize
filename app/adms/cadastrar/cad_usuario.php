@@ -83,14 +83,8 @@ include_once 'app/adms/include/head.php';
                     </div>
 
                     <div class="form-row">
-                        
-                    <div class="form-group col-md-4">
-                            <label>
-                             Foto
-                             <input type="file" name="imagem">
-                            </label>
-                        </div>
-                        <div class="form-group col-md-4">
+                    
+                        <div class="form-group col-md-6">
                         <label>
                                 <span class="text-danger">*</span>Nível de Acesso
                             </label>
@@ -111,7 +105,7 @@ include_once 'app/adms/include/head.php';
                                 ?>
                             </select>
                         </div>
-                        <div class="form-group col-md-4">
+                        <div class="form-group col-md-6">
                         <label>
                                 <span class="text-danger">*</span>Situação do Usuário
                             </label>
@@ -133,7 +127,18 @@ include_once 'app/adms/include/head.php';
                             </select>
                         </div>
                     </div>
-                    
+                    <div class="form-row">
+                        
+                    <div class="form-group col-md-6">
+                            <label>
+                             Foto
+                             <input type="file" name="imagem" onchange="previewImagem()">
+                            </label>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <img src="<?php echo pg.'/assets/imagens/usuario/preview_img.png';?>" id="prevuew-user" class="img=thumbnail" style="width: 150px; height: 150px;" >
+                        </div>
+                        
                     <p><span class="text-danger">*</span> Campo Obrogatório</p>
                     <input name="SendCadUser" type="submit" class="btn btn-success" value="Cadastrar">
                 </form>
@@ -145,5 +150,23 @@ include_once 'app/adms/include/head.php';
     unset($_SESSION['dados']);
     include_once 'app/adms/include/rodape_lib.php';
     ?>
+    <script>
+        function previewImagem(){
+            var imagem = document.querySelector('input[name=imagem]').files[0];
+            var preview = document.querySelector('#prevuew-user');
+
+            var reader = new FileReader();
+
+            reader.onloadend = function(){
+                preview.src = reader.result;
+            }
+
+            if (imagem) {
+                reader.readAsDataURL(imagem);
+            }else{
+                preview.src = ""; 
+            }
+        }
+    </script>
     </div>
 </body>

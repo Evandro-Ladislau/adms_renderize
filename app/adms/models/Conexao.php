@@ -991,6 +991,7 @@ class Conexao
         $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
         return $result;
     }
+    
 
     public function listarSituacaoMenu()
     {
@@ -1244,18 +1245,20 @@ class Conexao
         $email,
         $usuario,
         $senha,
+        $valor_foto,
         $adms_niveis_acesso_id,
         $adms_sits_usuario_id
     ) {
 
         $cmd = $this->pdo->prepare("INSERT INTO  adms_usuarios 
-        (nome, email, usuario, senha, adms_niveis_acesso_id, adms_sits_usuario_id, created )
+        (nome, email, usuario, senha, imagem, adms_niveis_acesso_id, adms_sits_usuario_id, created )
 
-        VALUES (:nome, :email, :usuario, :senha, :adms_niveis_acesso_id, :adms_sits_usuario_id, NOW()) ");
+        VALUES (:nome, :email, :usuario, :senha, :imagem, :adms_niveis_acesso_id, :adms_sits_usuario_id, NOW()) ");
 
         $cmd->bindValue(":nome", $nome, PDO::PARAM_STR);
         $cmd->bindValue(":email", $email, PDO::PARAM_STR);
         $cmd->bindValue(":usuario", $usuario, PDO::PARAM_STR);
+        $cmd->bindValue(":imagem", $valor_foto, PDO::PARAM_STR);
         $cmd->bindValue(":senha", $senha, PDO::PARAM_STR);
         $cmd->bindValue(":adms_niveis_acesso_id", $adms_niveis_acesso_id, PDO::PARAM_INT);
         $cmd->bindValue(":adms_sits_usuario_id", $adms_sits_usuario_id, PDO::PARAM_INT);
@@ -1265,6 +1268,186 @@ class Conexao
         $cmd = $this->pdo->lastInsertId();
         return $cmd;
     }
+
+
+    public function pesquisarUsuariosCadastradosSuper($id)
+    {
+        $result = array();
+        $cmd = $this->pdo->prepare("SELECT user.* ,
+        sit.nome nome_sit,
+        cors.cor cor_cores,
+        nivac.nome nome_nivac
+        FROM adms_usuarios user
+        INNER JOIN adms_sits_usuarios sit ON sit.id=user.adms_sits_usuario_id
+        INNER JOIN adms_cors cors	ON cors.id=sit.adms_cor_id
+        INNER JOIN adms_niveis_acessos nivac ON nivac.id=user.adms_niveis_acesso_id
+        WHERE user.id=:id LIMIT 1");
+        $cmd->bindValue(":id", $id, PDO::PARAM_INT);
+        $cmd->execute();
+        $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+    }
+
+    public function pesquisarUsuariosCadastrados($id, $ordem)
+    {
+        $result = array();
+        $cmd = $this->pdo->prepare("SELECT user.* ,
+        sit.nome nome_sit,
+        cors.cor cor_cores,
+        nivac.nome nome_nivac
+        FROM adms_usuarios user
+        INNER JOIN adms_sits_usuarios sit ON sit.id=user.adms_sits_usuario_id
+        INNER JOIN adms_cors cors	ON cors.id=sit.adms_cor_id
+        INNER JOIN adms_niveis_acessos nivac ON nivac.id=user.adms_niveis_acesso_id
+        WHERE user.id=:id  AND nivac.ordem > :ordem  LIMIT 1");
+        $cmd->bindValue(":id", $id, PDO::PARAM_INT);
+        $cmd->bindValue(":ordem", $ordem, PDO::PARAM_INT);
+        $cmd->execute();
+        $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+    }
+
+
+    public function VerificarUsuariosCadastradosNoBanco($id)
+    {
+        $result = array();
+        $cmd = $this->pdo->prepare("SELECT * FROM adms_usuarios WHERE id=:id LIMIT 1");
+        $cmd->bindValue(":id", $id, PDO::PARAM_INT);
+        $cmd->execute();
+        $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+    }
+
+    public function validarCadUsuarioDuplicadoNoEditar($email, $usuario, $dados_validos_id)
+    {
+        $result = array();
+        $cmd = $this->pdo->prepare("SELECT id FROM adms_usuarios 
+        WHERE email=:email OR usuario=:usuario AND id <> :id  ");
+        $cmd->bindValue(":email", $email, PDO::PARAM_STR);
+        $cmd->bindValue(":usuario", $usuario, PDO::PARAM_STR);
+        $cmd->bindValue(":id", $dados_validos_id, PDO::PARAM_INT);
+        $cmd->execute();
+        $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+    }
+
+
+    public function buscarProdutos($inicio,  $qnt_result_pg){
+        $result = array();
+        $cmd = $this->pdo->prepare("SELECT produtos.*,
+        unidade.nome 
+        FROM adms_produtos produtos 
+        INNER JOIN adms_unidades unidade ON unidade.id=adms_unidade_id
+        ORDER BY produtos.id ASC LIMIT :inicio, :qnt_result_pg ");
+        $cmd->bindValue(":inicio", $inicio, PDO::PARAM_INT);
+        $cmd->bindValue(":qnt_result_pg", $qnt_result_pg, PDO::PARAM_INT);
+        $cmd->execute();
+        $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+    }
+
+    public function listarUnidades()
+    {
+        $result = array();
+        $cmd = $this->pdo->query("SELECT id, nome FROM  adms_unidades ORDER BY nome ASC");
+        $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+    }
+
+
+    public function CadastrarProduto(
+        $descricao,
+        $adms_unidade_id,
+        $estoque,
+        $preco_custo,
+        $preco_venda,
+        $adms_sit_id
+        )
+        {
+        $cmd = $this->pdo->prepare("INSERT INTO adms_produtos
+        (
+            descricao,
+            adms_unidade_id,
+            estoque,
+            preco_custo,
+            preco_venda,
+            adms_sit_id,
+            created
+            )
+            VALUES 
+            ( 
+                :descricao,
+                :adms_unidade_id,
+                :estoque,
+                :preco_custo,
+                :preco_venda,
+                :adms_sit_id,
+                NOW()
+            )
+             ");
+        $cmd->bindValue(":descricao", $descricao, PDO::PARAM_STR);
+        $cmd->bindValue(":adms_unidade_id", $adms_unidade_id, PDO::PARAM_INT);
+        $cmd->bindValue(":estoque", $estoque);
+        $cmd->bindValue(":preco_custo", $preco_custo);
+        $cmd->bindValue(":preco_venda", $preco_venda);
+        $cmd->bindValue(":adms_sit_id", $adms_sit_id, PDO::PARAM_INT);
+        $cmd->execute();
+        return true;     
+    }
+
+    
+
+    public function VerificarProdutosCadastrados($id)
+    {
+        $result = array();
+        $cmd = $this->pdo->prepare("SELECT produto.*, 
+        unidade.id,  
+        unidade.nome
+        FROM adms_produtos produto
+        INNER JOIN adms_unidades unidade ON unidade.id=produto.adms_unidade_id
+        WHERE produto.id=:id LIMIT 1");
+        $cmd->bindValue(":id", $id, PDO::PARAM_INT);
+        $cmd->execute();
+        $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+    }
+
+    public function EditarProduto(
+        $descricao,
+        $estoque,
+        $preco_custo,
+        $preco_venda,
+        $adms_sit_id,
+        $id
+    ) {
+        $cmd = $this->pdo->prepare("UPDATE adms_produtos SET 
+        descricao=:descricao,
+        estoque=:estoque,
+        preco_custo=:preco_custo,
+        preco_venda=:preco_venda,
+        adms_sit_id=:adms_sit_id,
+        modified=NOW() WHERE id=:id");
+
+        $cmd->bindValue(":descricao", $descricao, PDO::PARAM_STR);
+        $cmd->bindValue(":estoque", $estoque);
+        $cmd->bindValue(":preco_custo", $preco_custo);
+        $cmd->bindValue(":preco_venda", $preco_venda);
+        $cmd->bindValue(":adms_sit_id", $adms_sit_id, PDO::PARAM_INT);
+        $cmd->bindValue(":id", $id, PDO::PARAM_INT);
+        $cmd->execute();
+        return true;
+    }
+
+    public function verificarProdutoRelacionado($id)
+    {
+        $result = array();
+        $cmd = $this->pdo->prepare("SELECT id FROM adms_movestoque_itens WHERE adms_produto_id=:id LIMIT 1 ");
+        $cmd->bindValue("id", $id, PDO::PARAM_INT);
+        $cmd->execute();
+        $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+    }
+
 }
 
 

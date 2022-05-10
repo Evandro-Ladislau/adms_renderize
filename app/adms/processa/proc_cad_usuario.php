@@ -61,6 +61,7 @@ if ($SendCadUser) {
         $erro = true;
         $_SESSION['msg'] = "<div class='alert alert-danger'> O usuário deve ter no mínimo 6 caracteres!</div>";
     }
+    
     else {
         //Proibir o cadatro de email e senha duplicado
         $resultado_user_duplicado = $pdo->validarCadUsuarioDuplicado($dados['email'], $dados['usuario']);
@@ -68,6 +69,28 @@ if ($SendCadUser) {
         if ($resultado_user_duplicado) {
             $erro = true;
             $_SESSION['msg'] = "<div class='alert alert-danger'> Este email ou usuário já esta cadastrado!</div>";
+        }
+        
+    }
+
+    //criar as variaveis da foto quando a mesma não está sendo cadastrada
+    if (empty($_FILES['imagem']['name'])) {
+        $campo_foto = "";
+        $valor_foto = "";
+
+    }else {
+        //validar extensao da imagem
+        $foto = $_FILES['imagem'];
+        include_once 'lib/lib_val_img_ext.php';
+
+        if (!validarExtensao($foto['type'])) {
+            $erro = true;
+            $_SESSION['msg'] = "<div class='alert alert-danger'> Extensão da imagem inválida!</div>";
+        }else{
+            include_once 'lib/lib_caracter_esp.php';
+            $foto['name'] = caracterEspecial($foto['name']);
+            $campo_foto = "imagem,";
+            $valor_foto = "".$foto['name']."";
         }
     }
 
@@ -89,7 +112,8 @@ if ($SendCadUser) {
         $dados['nome'],
         $dados['email'], 
         $dados['usuario'], 
-        $dados['senha'], 
+        $dados['senha'],
+        $valor_foto, 
         $dados['adms_niveis_acesso_id'], 
         $dados['adms_sits_usuario_id']
     );
@@ -104,10 +128,10 @@ if ($SendCadUser) {
             $usuario_id = $result_cad_usuario; 
 
             //Redimensionar a imagem e fazer upload
-            if (!empty($_FILES['imagem']['name'])) {
+            if (!empty($foto['name'])) {
                 include_once 'lib/lib_upload.php';
                 $destino = "assets/imagens/usuario/".$usuario_id."/";
-                upload($_FILES['imagem'], $destino, 200, 150);
+                upload($foto, $destino, 150, 150);
             }
             
             
