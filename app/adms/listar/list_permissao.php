@@ -17,7 +17,7 @@ if (!empty($id)) {
     $pagina = (!empty($pagina_atual) ? $pagina_atual : 1);
 
     //setar a quantidade de resultado por página
-    $qnt_result_pg = 50;
+    $qnt_result_pg = 60;
 
     //Calcular o inicio da visualização
 

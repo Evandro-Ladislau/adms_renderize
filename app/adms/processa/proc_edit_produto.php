@@ -38,20 +38,23 @@ if ($SendEditProduto) {
 
         //NÃO HÁ ERRO NO FORMULÁRIO TENTA CADASTRAR NO BANCO
     } else {
-       $result_edit_Produto = $pdo->EditarProduto($dados_validos['descricao'], 
+       $result_edit_Produto = $pdo->EditarProduto($dados_validos['descricao'],
+                                                $dados_validos['adms_unidade_id'],     
                                                 $dados_validos['estoque'], 
                                                 $dados_validos['preco_custo'], 
                                                 $dados_validos['preco_venda'], 
                                                 $dados_validos['adms_sit_id'], 
                                                 $dados_validos['id']);
 
+        print_r($dados_validos);
+
         
         if ($result_edit_Produto) {
             unset($_SESSION['dados']);
 
             $_SESSION['msg'] = "<div class='alert alert-success'> Produto editado com sucesso! </div>";
-            $url_destino = pg . '/listar/list_produto';
-            header("Location: $url_destino");
+           // $url_destino = pg . '/listar/list_produto';
+            //header("Location: $url_destino");
         } else {
             
             $_SESSION['msg'] = "<div class='alert alert-danger'> Produto não editada! </div>";

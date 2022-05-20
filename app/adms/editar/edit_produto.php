@@ -39,7 +39,7 @@ if (!empty($id)) {
                             <div class="p-2">
                                 <span class="d-none d-md-block">
                                     <?php
-
+                                    print_r($result_edit_produto);
                                     for ($i = 0; $i < count($result_edit_produto); $i++) {
                                         //BOTAO LISTAR
                                         $btn_list = $pdo->carregarBtn('listar/list_produto');

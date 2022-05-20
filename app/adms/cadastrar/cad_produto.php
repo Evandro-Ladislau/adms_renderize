@@ -67,7 +67,7 @@ include_once 'app/adms/include/head.php';
                         <input name="estoque" type="number" step="0.010" class="form-control" placeholder="0.00" value="<?php if (isset( $_SESSION['dados']['estoque'])){echo  $_SESSION['dados']['estoque'];}?>">
                     </div>
 
-                    <div class="form-group ">
+                    <div class="form-group col-md-3">
                             <label>
                             <span tabindex="0" data-placement="top" data-toggle="tooltip" title="Selecionar a medida do produto.">
                             <i class="fas fa-question-circle"></i>       

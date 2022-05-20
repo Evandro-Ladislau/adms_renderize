@@ -137,7 +137,7 @@ class Conexao
     {
         $result = array();
         $cmd = $this->pdo->prepare("SELECT * FROM adms_niveis_acessos 
-        WHERE ordem > :ordem 
+        WHERE ordem >= :ordem 
         ORDER BY ordem 
         ASC LIMIT :inicio, :qnt_result_pg");
         $cmd->bindValue(":inicio", $inicio, PDO::PARAM_INT);
@@ -203,7 +203,7 @@ class Conexao
     public function buscarDadosNivelAcessoLimitada($id)
     {
         $result = array();
-        $cmd = $this->pdo->prepare("SELECT * FROM adms_niveis_acessos WHERE ordem > :ordem 
+        $cmd = $this->pdo->prepare("SELECT * FROM adms_niveis_acessos WHERE ordem >= :ordem 
         AND id=:id ORDER BY ordem ASC LIMIT 1");
 
         $cmd->bindValue(":ordem", $_SESSION['ordem'], PDO::PARAM_INT);
@@ -1192,7 +1192,7 @@ class Conexao
         nivac.nome nome_nivac, nivac.ordem
         FROM adms_usuarios user
         INNER JOIN adms_niveis_acessos nivac ON nivac.id=user.adms_niveis_acesso_id
-        WHERE nivac.ordem > :ordem
+        WHERE nivac.ordem >= :ordem
         ORDER BY user.id 
         LIMIT :inicio, :qnt_result_pg");
         $cmd->bindValue(":inicio", $inicio, PDO::PARAM_INT);
@@ -1215,7 +1215,7 @@ class Conexao
     public function BuscarNiveisAcessosCadastrados()
     {
         $result = array();
-        $cmd = $this->pdo->query("SELECT id, nome FROM  adms_niveis_acessos ORDER BY nome ASC");
+        $cmd = $this->pdo->query("SELECT id, nome FROM  adms_niveis_acessos WHERE ordem >= 2 ORDER BY nome ASC");
         $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
         return $result;
     }
@@ -1401,7 +1401,7 @@ class Conexao
     {
         $result = array();
         $cmd = $this->pdo->prepare("SELECT produto.*, 
-        unidade.id,  
+        unidade.id id_un,  
         unidade.nome
         FROM adms_produtos produto
         INNER JOIN adms_unidades unidade ON unidade.id=produto.adms_unidade_id
@@ -1448,6 +1448,293 @@ class Conexao
         return $result;
     }
 
+    public function deletarProduto($id)
+    {
+        $cmd = $this->pdo->prepare("DELETE FROM adms_produtos WHERE id=:id");
+        $cmd->bindValue(":id", $id, PDO::PARAM_INT);
+        $cmd->execute();
+        return true;
+    }
+
+    public function listarTiposOperacoes()
+    {
+        $result = array();
+        $cmd = $this->pdo->query("SELECT id, nome FROM adms_tipos_operacoes ORDER BY nome ASC");
+        $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+    }
+
+    public function listarUsuariosOp(){
+        $result = array();
+        $cmd = $this->pdo->query("SELECT * FROM adms_usuarios");
+        $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+    }
+
+   public function listarProdutosOperacao(){
+       $result = array();
+       $cmd = $this->pdo->query("SELECT * FROM adms_produtos");
+       $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+       return $result;
+   }
+
+
+   //verificar se existe o item na operação
+   public function VerificarItem($adms_operacao_id, $adms_produto_id){
+       $result = array();
+       $cmd = $this->pdo->prepare("SELECT quantidade FROM adms_movestoque_itens WHERE adms_operacao_id=:adms_operacao_id AND adms_produto_id=:adms_produto_id");
+       $cmd->bindValue(":adms_operacao_id", $adms_operacao_id, PDO::PARAM_INT);
+       $cmd->bindValue(":adms_produto_id", $adms_produto_id, PDO::PARAM_INT);
+       $cmd->execute();
+       $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+       return $result;
+   }
+
+   
+    //Atualizar Caso ja tenha o produto na tabela itens.
+    public function AtualizarQuantidade($quantidade_total, $adms_operacao_id, $adms_produto_id ){
+        $cmd = $this->pdo->prepare("UPDATE adms_movestoque_itens SET 
+        quantidade=:quantidade,
+        modified=NOW() WHERE adms_operacao_id=:adms_operacao_id 
+        AND adms_produto_id=:adms_produto_id");
+        $cmd->bindValue(":quantidade", $quantidade_total);
+        $cmd->bindValue(":adms_operacao_id", $adms_operacao_id, PDO::PARAM_INT);
+        $cmd->bindValue(":adms_produto_id", $adms_produto_id, PDO::PARAM_INT);
+        $cmd->execute();
+        return true;
+    }
+
+   //CADASTRAR Itens da Operacao
+   public function cadastrarItensOperacao(
+
+   $adms_operacao_id, 
+   $adms_produto_id, 
+   $quantidade, 
+   $adms_unidade_id)
+
+   {
+       $cmd = $this->pdo->prepare("INSERT INTO adms_movestoque_itens (
+           adms_operacao_id, 
+           adms_produto_id, 
+           quantidade, 
+           adms_unidade_id, 
+           created)
+            
+       VALUES (:adms_operacao_id, 
+                :adms_produto_id, 
+                :quantidade, 
+                :adms_unidade_id,   
+                NOW()) ");
+
+       $cmd->bindValue(":adms_operacao_id", $adms_operacao_id, PDO::PARAM_STR);
+       $cmd->bindValue(":adms_produto_id", $adms_produto_id, PDO::PARAM_INT);
+       $cmd->bindValue(":quantidade", $quantidade, PDO::PARAM_INT);
+       $cmd->bindValue(":adms_unidade_id", $adms_unidade_id, PDO::PARAM_INT);
+       $cmd->execute();
+       return true;
+   }
+
+   public function OperacaoID(){
+       $cmd = $this->pdo->prepare("SELECT * FROM adms_operacao ORDER BY id DESC LIMIT 1");
+       $cmd->execute();
+       $cmd = $cmd->fetchAll(PDO::FETCH_ASSOC);
+       return $cmd;
+
+   }
+
+   public function BuscarItensOperacao($adms_operacao_id){
+       $result = array();
+       $cmd = $this->pdo->prepare("SELECT mov_itens.adms_produto_id prod_id, 
+       prod.descricao prod_desc, 
+       unidade.nome un_nome, 
+       mov_itens.quantidade mov_quantidade
+       FROM adms_movestoque_itens mov_itens
+       INNER JOIN adms_produtos prod ON prod.id=mov_itens.adms_produto_id
+       INNER JOIN adms_unidades unidade ON unidade.id=mov_itens.adms_unidade_id
+       WHERE mov_itens.adms_operacao_id=:adms_operacao_id");
+       $cmd->bindValue(":adms_operacao_id", $adms_operacao_id, PDO::PARAM_INT);
+       $cmd->execute();
+       $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+       return $result;
+       
+       
+   }
+
+   
+
+
+//Cadastrar Operacao de estoque
+public function cadastrarOperacaoEstoque(
+    $adms_operacao_id,
+    $adms_usuario_id,
+    $adms_tipo_operacao_id,
+    $obs)
+
+{
+     $cmd = $this->pdo->prepare("INSERT INTO adms_operacoes_estoque (
+         adms_operacao_id, 
+         adms_usuario_id, 
+         adms_tipo_operacao_id, 
+         obs,
+         created) 
+
+     VALUES (:adms_operacao_id,
+             :adms_usuario_id,
+             :adms_tipo_operacao_id,
+             :obs,
+             NOW()) ");
+     $cmd->bindValue(":adms_operacao_id", $adms_operacao_id, PDO::PARAM_INT );
+     $cmd->bindValue(":adms_usuario_id", $adms_usuario_id, PDO::PARAM_INT );
+     $cmd->bindValue(":adms_tipo_operacao_id", $adms_tipo_operacao_id, PDO::PARAM_INT );
+     $cmd->bindValue(":obs", $obs, PDO::PARAM_STR );
+     $cmd->execute();
+     return true;
+
+}
+
+//FINALIZAR OPERACAO DE ESTOQUE
+public function OperacaoInsertId($id){
+    $cmd = $this->pdo->prepare("INSERT INTO adms_operacao (id, created) VALUES (:id, NOW()) ");
+    $cmd->bindValue(":id", $id, PDO::PARAM_INT);
+    $cmd->execute();
+    return true;
+
+}
+
+//Deletar item da operação de estoque pegando o id do produto e o codigo da operacao de estoque no item setado
+public function deletarItem($id, $adms_operacao_id)
+    {
+        $cmd = $this->pdo->prepare("DELETE FROM 
+        adms_movestoque_itens 
+        WHERE adms_produto_id=:id 
+        AND adms_operacao_id=:adms_operacao_id 
+        ORDER BY adms_operacao_id DESC LIMIT 1");
+        $cmd->bindValue(":id", $id, PDO::PARAM_INT);
+        $cmd->bindValue(":adms_operacao_id", $adms_operacao_id, PDO::PARAM_INT);
+        $cmd->execute();
+        return true;
+    }
+
+    public function BuscarItensOperacaoParaAtualizarEstoque($adms_operacao_id){
+        $result = array();
+        $cmd = $this->pdo->prepare("SELECT 
+        itens.adms_operacao_id, 
+        itens.adms_produto_id, 
+        itens.quantidade,
+        op_estoque.adms_tipo_operacao_id 
+        FROM adms_movestoque_itens itens
+        INNER JOIN adms_operacoes_estoque op_estoque ON op_estoque.adms_operacao_id=itens.adms_operacao_id
+        WHERE itens.adms_operacao_id=:adms_operacao_id");
+        $cmd->bindValue(":adms_operacao_id", $adms_operacao_id, PDO::PARAM_INT);
+        $cmd->execute();
+        $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+    }
+
+    public function EstoqueAtual($adms_operacao_id){
+        $result = array();
+        $cmd = $this->pdo->prepare("SELECT produtos.id, produtos.estoque 
+        FROM adms_produtos produtos
+        INNER JOIN adms_movestoque_itens itens ON itens.adms_produto_id=produtos.id
+        WHERE produtos.id=itens.adms_produto_id AND itens.adms_operacao_id=:adms_operacao_id");
+        $cmd->bindValue(":adms_operacao_id", $adms_operacao_id, PDO::PARAM_INT);
+        $cmd->execute();
+        $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+    }
+
+    public function AtualizarEstoqueOperacao($estoque, $adms_produto_id){
+        $cmd = $this->pdo->prepare("UPDATE adms_produtos 
+        SET estoque=:estoque 
+        WHERE id=:adms_produto_id");
+        $cmd->bindValue(":estoque", $estoque);
+        $cmd->bindValue(":adms_produto_id", $adms_produto_id, PDO::PARAM_INT);
+        $cmd->execute();
+        $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+        return true;
+
+    }
+
+    //Listar Operações de Estoque
+    public function ListarOperacaoEstoque(){
+        $result = array();
+        $cmd = $this->pdo->prepare("SELECT op_estoque.adms_operacao_id, 
+        op_estoque.obs, 
+        tp_operacao.nome tp_nome, 
+        usuario.nome, 
+        op_estoque.created 
+        FROM adms_operacoes_estoque op_estoque
+        INNER JOIN adms_usuarios usuario ON usuario.id=op_estoque.adms_usuario_id
+        INNER JOIN adms_tipos_operacoes tp_operacao ON tp_operacao.id=op_estoque.adms_tipo_operacao_id");
+        $cmd->execute();
+        $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+    }
+
+    //vISUALIZAR OPERACAO DE ESTOQUE
+    public function VisualizarOperacaoEstoque($id){
+        $result = array();
+        $cmd = $this->pdo->prepare("SELECT op_estoque.id, op_estoque.adms_operacao_id, 
+        op_estoque.obs, 
+        tp_operacao.nome tp_nome, 
+        usuario.nome, 
+        op_estoque.created 
+        FROM adms_operacoes_estoque op_estoque
+        INNER JOIN adms_usuarios usuario ON usuario.id=op_estoque.adms_usuario_id
+        INNER JOIN adms_tipos_operacoes tp_operacao ON tp_operacao.id=op_estoque.adms_tipo_operacao_id
+        WHERE op_estoque.adms_operacao_id=:id ");
+        $cmd->bindValue(":id", $id, PDO::PARAM_INT);
+        $cmd->execute();
+        $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+    }
+
+    //Apagar Operação de estoque
+
+
+    public function ApagarOperacaoEstoque($id){
+        $cmd = $this->pdo->prepare("DELETE FROM adms_operacoes_estoque WHERE adms_operacao_id=:id");
+        $cmd->bindValue(":id", $id, PDO::PARAM_INT);
+        $cmd->execute();
+        return true;
+    }
+
+   //Apagar Itens
+   public function ApagarItensOperação($id){
+       $cmd = $this->pdo->prepare("DELETE FROM adms_movestoque_itens WHERE adms_operacao_id=:id");
+       $cmd->bindValue(":id", $id, PDO::PARAM_INT);
+       $cmd->execute();
+       return true;
+
+   }
+
+   //Deash Boardes
+   public function NumeroDeUsuarios(){
+       $result = array();
+       $cmd = $this->pdo->prepare("SELECT count(id) FROM adms_usuarios");
+       $cmd->execute();
+       $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+       return $result;
+
+   }
+   public function NumeroDeProdutosCadastrados(){
+    $result = array();
+    $cmd = $this->pdo->prepare("SELECT count(id) FROM adms_produtos");
+    $cmd->execute();
+    $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+    return $result;
+
+}
+
+public function NumeroDeOperacoesEstoque(){
+    $result = array();
+    $cmd = $this->pdo->prepare("SELECT count(id) FROM adms_operacoes_estoque");
+    $cmd->execute();
+    $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+    return $result;
+}
+   
+    
 }
 
 

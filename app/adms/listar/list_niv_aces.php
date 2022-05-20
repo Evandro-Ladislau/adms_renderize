@@ -21,7 +21,7 @@ include_once 'app/adms/include/head.php';
             <div class="list-group-item">
                 <div class="d-flex">
                     <div class="mr-auto p-2">
-                        <h2 class="display-4 titulo">Listar Nivel de Acesso</h2>
+                        <h2 class="display-4 titulo">Listar Nível de Acesso</h2>
                     </div>
                     <div class="p-2">
                         <?php

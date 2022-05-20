@@ -21,20 +21,14 @@ include_once 'app/adms/include/head.php';
             <div class="list-group-item">
                 <div class="d-flex">
                     <div class="mr-auto p-2">
-                        <h2 class="display-4 titulo">Listar Produtos</h2>
+                        <h2 class="display-4 titulo">Listar Operações de Estoque</h2>
                     </div>
                     <div class="p-2">
                         <?php
 
-                        $btn_cad = $pdo->carregarBtn('cadastrar/cad_produto');
-
-                        if ($btn_cad) {
-                            echo "<a href='" . pg . "/cadastrar/cad_produto' class='btn btn-outline-success btn-sm'>  Cadastar  </a>";
-                        }
-
                         $btn_op = $pdo->carregarBtn('cadastrar/cad_op_estoque');
 
-                        if ($btn_cad) {
+                        if ($btn_op) {
                             echo " <a href='" . pg . "/cadastrar/cad_op_estoque' class='btn btn-outline-success btn-sm'>  Operação de Estoque  </a>";
                         }
                         
@@ -49,7 +43,7 @@ include_once 'app/adms/include/head.php';
                         //Calcular o inicio da visualização
                         $inicio = ($qnt_result_pg * $pagina) - $qnt_result_pg;
 
-                        $result_produtos = $pdo->buscarProdutos($inicio, $qnt_result_pg);
+                        $result_op_estoque = $pdo->ListarOperacaoEstoque();
                         
 
 
@@ -69,61 +63,59 @@ include_once 'app/adms/include/head.php';
 
                 ?>
                 <?php
-                if ($result_produtos) {
+                if ($result_op_estoque) {
                 ?>
                     <div class="table-responsive">
                         <table class="table table table-bordered table-striped table-hover ">
                             <thead>
                                 <tr>
-                                    <th>ID</th>
-                                    <th>Descricão</th>
-                                    <th class="d-none d-sm-table-cell">UN</th>
-                                    <th class="d-none d-sm-table-cell">Estoque</th>
-                                    <th class="d-none d-sm-table-cell">Custo</th>
-                                    <th class="d-none d-sm-table-cell">Venda</th>
-                                    <th class="text-center">Ações</th>
+                                    <th>Código Operacao</th>
+                                    <th>Histórico</th>
+                                    <th class="d-none d-sm-table-cell">Tipo de Operação</th>
+                                    <th class="d-none d-sm-table-cell">Funcionário</th>
+                                    <th class="d-none d-sm-table-cell">Emissão</th>
+                                    <th class="d-none d-sm-table-cell">Ações</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <?php
                                 $qnt_linhas_exe = 1;
-                                for ($i = 0; $i < count($result_produtos); $i++) {
+                                for ($i = 0; $i < count($result_op_estoque); $i++) {
                                 ?>
 
                                     <tr>
-                                        <td><?php echo $result_produtos[$i]['id']; ?></td>
+                                        <td><?php echo $result_op_estoque[$i]['adms_operacao_id']; ?></td>
                                         <td>
-                                        <?php echo $result_produtos[$i]['descricao']; ?></td>
+                                        <?php echo $result_op_estoque[$i]['obs']; ?></td>
                                         </td>
                                         <td class="d-none d-sm-table-cell">
-                                            <?php echo $result_produtos[$i]['nome']; ?>
+                                            <?php echo $result_op_estoque[$i]['tp_nome']; ?>
                                         </td>
                                         <td class="d-none d-sm-table-cell">
-                                            <?php echo $result_produtos[$i]['estoque']; ?>
+                                            <?php echo $result_op_estoque[$i]['nome']; ?>
                                         </td>
                                         <td>
-                                        <?php echo $result_produtos[$i]['preco_custo']; ?></td>
-                                        </td>
-                                        <td>
-                                        <?php echo $result_produtos[$i]['preco_venda']; ?></td>
+                                        <?php echo date('d/m/y H:i:s', strtotime($result_op_estoque[$i]['created'])) ?></td>
                                         </td>
                                         <td class="text-center">
                                             <span class="d-none d-md-block">
                                                 <?php
                                                 $qnt_linhas_exe++;
 
-                                                //BOTAR EDITAR
-                                                $btn_edit = $pdo->carregarBtn('editar/edit_produto');
+                                                //BOTAO VISUALIZAE
+                                                $btn_vis = $pdo->carregarBtn('visualizar/vis_op_estoque');
 
-                                                if ($btn_edit) {
-                                                    echo " <a href='" . pg . "/editar/edit_produto?id=" . $result_produtos[$i]['id'] . "' class='btn btn-outline-warning btn-sm' > Editar </a>";
+                                                if ($btn_vis) {
+                                                    echo " <a href='" . pg . "/visualizar/vis_op_estoque?id=" . $result_op_estoque[$i]['adms_operacao_id'] . "' class='btn btn-outline-primary btn-sm'> Visualizar </a>";
                                                 }
 
+                                                
+
                                                 //BOTAO PAGAR
-                                                $btn_apagar = $pdo->carregarBtn('processa/apagar_produto');
+                                                $btn_apagar = $pdo->carregarBtn('processa/apagar_op_estoque');
 
                                                 if ($btn_apagar) {
-                                                    echo " <a href='" . pg . "/processa/apagar_produto?id=" . $result_produtos[$i]['id'] . "' class='btn btn-outline-danger btn-sm' data-confirm='Tem Certeza que deseja excluir o item?'> Apagar </a>";
+                                                    echo " <a href='" . pg . "/processa/apagar_op_estoque?id=" . $result_op_estoque[$i]['adms_operacao_id'] . "' class='btn btn-outline-danger btn-sm' data-confirm='Tem Certeza que deseja excluir o item?'> Apagar </a>";
                                                 }
                                                 ?>
                                             </span>
@@ -134,15 +126,13 @@ include_once 'app/adms/include/head.php';
                                                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="acoeslistar">
                                                     <?php
                                                     if ($btn_vis) {
-                                                        echo "<a class='dropdown-item' href='" . pg . "/visualizar/vis_produto?id=" . $result_produtos[$i]['id'] . "'>Visualizar</a>";
+                                                        echo "<a class='dropdown-item' href='" . pg . "/visualizar/vis_op_estoque?id=" . $result_op_estoque[$i]['adms_operacao_id'] . "'>Visualizar</a>";
                                                     }
 
-                                                    if ($btn_edit) {
-                                                        echo "<a class='dropdown-item' href='" . pg . "/editar/edit_produto?id=" . $result_produtos[$i]['id'] . "'>Editar</a>";
-                                                    }
+                                                    
 
                                                     if ($btn_apagar) {
-                                                        echo "<a class='dropdown-item' href='" . pg . "/processa/apagar_produto?id=" . $result_produtos[$i]['id'] . "' data-confirm='Tem Certeza que deseja excluir o item?'>Apagar</a>";
+                                                        echo "<a class='dropdown-item' href='" . pg . "/processa/apagar_op_estoque?id=" . $result_op_estoque[$i]['adms_operacao_id'] . "' data-confirm='Tem Certeza que deseja excluir o item?'>Apagar</a>";
                                                     }
 
 
