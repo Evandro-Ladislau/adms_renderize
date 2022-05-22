@@ -39,7 +39,6 @@ if (!empty($id)) {
                             <div class="p-2">
                                 <span class="d-none d-md-block">
                                     <?php
-                                    print_r($result_edit_produto);
                                     for ($i = 0; $i < count($result_edit_produto); $i++) {
                                         //BOTAO LISTAR
                                         $btn_list = $pdo->carregarBtn('listar/list_produto');
@@ -113,7 +112,7 @@ if (!empty($id)) {
                                         <span tabindex="0" data-placement="top" data-toggle="tooltip" title="Descricao do produto">
                                             <i class="fas fa-question-circle"></i>
                                         </span>
-                                        <span class="text-danger">*</span> Descricao
+                                        <span class="text-danger">*</span> Descrição
                                     </label>
                                     <input name="descricao" type="text" class="form-control" placeholder="descricao do Produto" value="<?php if (isset($_SESSION['dados']['descricao'])) {
                                                                                                                                         echo  $_SESSION['dados']['descricao'];
@@ -129,7 +128,7 @@ if (!empty($id)) {
                                             <span tabindex="0" data-placement="top" data-toggle="tooltip" data-html="true" title="Quantidade de estoque do produto">
                                                 <i class="fas fa-question-circle"></i>
                                             </span>
-                                            <span class="text-danger">*</span> estoque
+                                            <span class="text-danger">*</span> Estoque
                                         </label>
                                         <input name="estoque" type="number" step="0.010" class="form-control" placeholder="0.00" value="<?php if (isset($_SESSION['dados']['estoque'])) {
                                                                                                                                         echo  $_SESSION['dados']['estoque'];
@@ -171,7 +170,7 @@ if (!empty($id)) {
                                             <span tabindex="0" data-placement="top" data-toggle="tooltip" data-html="true" title="Preço de custo do produto">
                                                 <i class="fas fa-question-circle"></i>
                                             </span>
-                                            <span class="text-danger">*</span> Preco de Custo
+                                            <span class="text-danger">*</span> Preço de Custo
                                         </label>
                                         <input name="preco_custo" type="number" step="0.010" class="form-control" placeholder="0.00" value="<?php if (isset($_SESSION['dados']['preco_custo'])) {
                                                                                                                                         echo  $_SESSION['dados']['preco_custo'];
@@ -185,7 +184,7 @@ if (!empty($id)) {
                                             <span tabindex="0" data-placement="top" data-toggle="tooltip" data-html="true" title="Preço de Venda do Produto">
                                                 <i class="fas fa-question-circle"></i>
                                             </span>
-                                            <span class="text-danger">*</span> Preco de Venda
+                                            <span class="text-danger">*</span> Preço de Venda
                                         </label>
                                         <input name="preco_venda" type="number" step="0.010" class="form-control" placeholder="0.00" value="<?php if (isset($_SESSION['dados']['preco_venda'])) {
                                                                                                                                         echo  $_SESSION['dados']['preco_venda'];
@@ -251,8 +250,8 @@ if (!empty($id)) {
 <?php
     } else {
         $_SESSION['msg'] = "<div class='alert alert-danger'> Página não encontrada! </div>";
-        $url_destino = pg . '/listar/list_menu';
-        header("Location: $url_destino");
+       // $url_destino = pg . '/listar/list_produto';
+       // header("Location: $url_destino");
     }
 } else {
     $_SESSION['msg'] = "<div class='alert alert-danger'> Página não encontrada! </div>";

@@ -22,7 +22,7 @@ include_once 'app/adms/include/head.php';
             <div class="list-group-item">
                 <div class="d-flex">
                     <div class="mr-auto p-2">
-                        <h2 class="display-4 titulo">Operacao de Estoque</h2>
+                        <h2 class="display-4 titulo">Operação de Estoque</h2>
                     </div>
                     <div class="p-2">
                         <?php
@@ -31,6 +31,12 @@ include_once 'app/adms/include/head.php';
 
                         if ($btn_list) {
                             echo "<a href='" . pg . "/listar/list_op_estoque?id=" . $_SESSION['id'] . "' class='btn btn-outline-info btn-sm'>Listar</a>";
+                        }
+
+                        $btn_list = $pdo->carregarBtn('listar/list_produto');
+
+                        if ($btn_list) {
+                            echo " <a href='" . pg . "/listar/list_produto?id=" . $_SESSION['id'] . "' class='btn btn-outline-success btn-sm'>Produtos</a>";
                         }
 
 
@@ -123,8 +129,8 @@ include_once 'app/adms/include/head.php';
                             <tr>
                                 <th>ID</th>
                                 <th>Descricão</th>
-                                <th class="d-none d-sm-table-cell">Unidade</th>
                                 <th class="d-none d-sm-table-cell">Quantidade</th>
+                                <th class="d-none d-sm-table-cell">Unidade</th>
                                 <th class="text-center">Ações</th>
                             </tr>
                         </thead>
@@ -145,10 +151,10 @@ include_once 'app/adms/include/head.php';
                                             <?php echo $itens_operacao[$i]['prod_desc']; ?></td>
                                         </td>
                                         <td class="d-none d-sm-table-cell">
-                                            <?php echo $itens_operacao[$i]['un_nome']; ?>
+                                            <?php echo $itens_operacao[$i]['mov_quantidade']; ?>
                                         </td>
                                         <td class="d-none d-sm-table-cell">
-                                            <?php echo $itens_operacao[$i]['mov_quantidade']; ?>
+                                            <?php echo $itens_operacao[$i]['un_nome']; ?>
                                         </td>
                                         <td class="text-center">
                                             <span class="d-none d-md-block">

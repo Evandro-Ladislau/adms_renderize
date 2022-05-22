@@ -1396,8 +1396,8 @@ class Conexao
     }
 
     
-
-    public function VerificarProdutosCadastrados($id)
+/**
+ * public function VerificarProdutosCadastrados($id)
     {
         $result = array();
         $cmd = $this->pdo->prepare("SELECT produto.*, 
@@ -1411,29 +1411,43 @@ class Conexao
         $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
         return $result;
     }
+ */
+    public function VerificarProdutosCadastrados($id){
+        $result = array();
+        $cmd = $this->pdo->prepare("SELECT * FROM adms_produtos WHERE id=:id LIMIT 1");
+        $cmd->bindValue(":id", $id, PDO::PARAM_INT);
+        $cmd->execute();
+        $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+    }
 
     public function EditarProduto(
-        $descricao,
-        $estoque,
-        $preco_custo,
-        $preco_venda,
-        $adms_sit_id,
+        $descricao, 
+        $estoque, 
+        $adms_unidade_id, 
+        $preco_custo, 
+        $preco_venda, 
+        $adms_sit_id, 
         $id
-    ) {
+
+        ) { 
+
         $cmd = $this->pdo->prepare("UPDATE adms_produtos SET 
-        descricao=:descricao,
-        estoque=:estoque,
+        descricao=:descricao, 
+        estoque=:estoque, 
+        adms_unidade_id=:adms_unidade_id, 
         preco_custo=:preco_custo,
         preco_venda=:preco_venda,
         adms_sit_id=:adms_sit_id,
         modified=NOW() WHERE id=:id");
 
-        $cmd->bindValue(":descricao", $descricao, PDO::PARAM_STR);
+        $cmd->bindValue(":descricao", $descricao);
         $cmd->bindValue(":estoque", $estoque);
+        $cmd->bindValue(":adms_unidade_id", $adms_unidade_id);
         $cmd->bindValue(":preco_custo", $preco_custo);
         $cmd->bindValue(":preco_venda", $preco_venda);
-        $cmd->bindValue(":adms_sit_id", $adms_sit_id, PDO::PARAM_INT);
-        $cmd->bindValue(":id", $id, PDO::PARAM_INT);
+        $cmd->bindValue(":adms_sit_id", $adms_sit_id);
+        $cmd->bindValue(":id", $id);
         $cmd->execute();
         return true;
     }
